@@ -26,7 +26,7 @@ function DateApprovals() {
             getDates();
         }
     } , [1]);
-    
+
   return (
     <div>DateApprovals
         <ul>
@@ -34,7 +34,7 @@ function DateApprovals() {
                 approvalDates.map((data , key)=>{
                     return (
                         
-                        <li key={key}>{data.dateTime}</li>
+                        <li key={key} title={`User : ${data.user}`}>{data.dateTime}</li>
                     )
                 })
             }
