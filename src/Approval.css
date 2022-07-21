@@ -1,0 +1,12 @@
+.btn-grp{
+    width :100px;
+    height : 100px;
+    position  : realtive;
+
+}
+.btn{
+    position: absolute;
+    left : 50px;
+    background-color: blue;
+    top : 0;
+}
