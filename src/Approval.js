@@ -5,17 +5,6 @@ import {collection, doc, setDoc, getDocs, query, getDoc} from "firebase/firestor
 
 function Approval() {
 
-  // const ref  = doc(db, "data", "one");
-
-  // const getData = async() =>{
-  //   const docu = await getDoc(ref);
-  //   if(docu.data()["25"]["campId"]===undefined){
-  //     console.log("true");
-  //   }else{
-  //     console.log("false")
-  //   }
-  // }
-
   const date = "27/04/22";
   const campName = "Instaclean";
 
