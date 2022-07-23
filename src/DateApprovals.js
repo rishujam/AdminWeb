@@ -6,19 +6,25 @@ import { Link } from 'react-router-dom';
 function DateApprovals() {
 
     const [approvalDates, setApprovalDates]  = useState([]);
+    const [uniqueDates, setUniqueDates] = useState([]);
+    const [dataToPass, setDataToPass] = useState([]);
 
     const getDates = async() =>{
         const querySnap = await getDocs(collection(db, "data"));
         let eventData = [];
+        let tempUniqueDates = [];
         querySnap.forEach((doc) =>{
             Object.keys(doc.data()).forEach((key) =>{
-                if(doc.data()[key]["campId"]!==undefined){
-                    //Add this doc object to list
+                if(doc.data()[key]["campId"]!==undefined ){
+                    if(!(eventData.some(item => doc.data()[key]["dateTime"].split(",")[0] === item["dateTime"].split(",")[0]))){
+                        tempUniqueDates.push(doc.data()[key]["dateTime"].split(",")[0]);
+                    }
                     eventData.push(doc.data()[key]);
                 }
             })
         })
         setApprovalDates(eventData);
+        setUniqueDates(tempUniqueDates);
     }
 
 
@@ -43,18 +49,29 @@ function DateApprovals() {
     // const sendData = async() =>{
     //     await setDoc(doc(db, "data", "one"), docData, {merge:true});
     // }
+    console.log(uniqueDates);
     console.log(approvalDates);
+
+    const filterAndPassData=(date) =>{
+        let tempDataToPass = [];
+        approvalDates.forEach((approval) =>{
+            if(approval["dateTime"].split(",")[0]===date){
+                tempDataToPass.push(approval);
+            }
+        })
+        setDataToPass(tempDataToPass);
+    }
     
   return (
     <div>
         <h1>Date of Approvals </h1>
         <ul>
             {
-                approvalDates.map((dat , key)=>{
+                uniqueDates.map((dat , key)=>{
                     return (
                         <div>
-                            <li key={key}>{dat.dateTime.split(",")[0]}</li>
-                            <Link to = "/approvalname" state={{data: dat}}>See</Link>
+                            <li key={key} >{dat}</li>
+                            <Link to = "/approvalname" onClick={filterAndPassData(dat)} state={{data: dataToPass}}>See</Link>
                         </div>
  
                     )
