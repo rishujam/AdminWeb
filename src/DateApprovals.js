@@ -12,7 +12,7 @@ function DateApprovals() {
         let eventData = [];
         querySnap.forEach((doc) =>{
             Object.keys(doc.data()).forEach((key) =>{
-                if(doc.data()[key]["campId"]!==undefined ){
+                if(doc.data()[key]["campId"]!==undefined){
                     //Add this doc object to list
                     eventData.push(doc.data()[key]);
                 }
@@ -20,6 +20,8 @@ function DateApprovals() {
         })
         setApprovalDates(eventData);
     }
+
+
 
     useEffect(()=>{
         if(approvalDates.length<1){
@@ -41,19 +43,20 @@ function DateApprovals() {
     // const sendData = async() =>{
     //     await setDoc(doc(db, "data", "one"), docData, {merge:true});
     // }
+    console.log(approvalDates);
     
   return (
     <div>
         <h1>Date of Approvals </h1>
         <ul>
             {
-                approvalDates.map((data , key)=>{
+                approvalDates.map((dat , key)=>{
                     return (
                         <div>
-                            <li key={key}>{data.dateTime.split(",")[0]}</li>
-                            <Link to ="/approvalname">See</Link>
+                            <li key={key}>{dat.dateTime.split(",")[0]}</li>
+                            <Link to = "/approvalname" state={{data: dat}}>See</Link>
                         </div>
-                        
+ 
                     )
                 })
             }
