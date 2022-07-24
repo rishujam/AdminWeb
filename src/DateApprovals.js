@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import {db} from "./firebase-config"
-import {collection, doc, setDoc, getDocs, query, getDoc} from "firebase/firestore";
+import { db } from "./firebase-config"
+import { collection, doc, setDoc, getDocs, query, getDoc } from "firebase/firestore";
 import { Link } from 'react-router-dom';
 
 function DateApprovals() {
 
-    const [approvalDates, setApprovalDates]  = useState([]);
-    const [uniqueDates, setUniqueDates] = useState([]);
-    const [dataToPass, setDataToPass] = useState([]);
+    const [ approvalDates, setApprovalDates ] = useState([]);
+    const [ uniqueDates, setUniqueDates ] = useState([]);
 
-    const getDates = async() =>{
+    const getDates = async () => {
         const querySnap = await getDocs(collection(db, "data"));
         let eventData = [];
         let tempUniqueDates = [];
-        querySnap.forEach((doc) =>{
-            Object.keys(doc.data()).forEach((key) =>{
-                if(doc.data()[key]["campId"]!==undefined ){
-                    if(!(eventData.some(item => doc.data()[key]["dateTime"].split(",")[0] === item["dateTime"].split(",")[0]))){
-                        tempUniqueDates.push(doc.data()[key]["dateTime"].split(",")[0]);
+        querySnap.forEach((doc) => {
+            Object.keys(doc.data()).forEach((key) => {
+                if (doc.data()[ key ][ "campId" ] !== undefined) {
+                    if (!(eventData.some(item => doc.data()[ key ][ "dateTime" ].split(",")[ 0 ] === item[ "dateTime" ].split(",")[ 0 ]))) {
+                        tempUniqueDates.push(doc.data()[ key ][ "dateTime" ].split(",")[ 0 ]);
                     }
-                    eventData.push(doc.data()[key]);
+                    eventData.push(doc.data()[ key ]);
                 }
             })
         })
@@ -29,11 +28,11 @@ function DateApprovals() {
 
 
 
-    useEffect(()=>{
-        if(approvalDates.length<1){
+    useEffect(() => {
+        if (approvalDates.length < 1) {
             getDates();
         }
-    } , [1]);
+    }, [ 1 ]);
 
     // const docData = {
     //     "22,1": {
@@ -49,37 +48,35 @@ function DateApprovals() {
     // const sendData = async() =>{
     //     await setDoc(doc(db, "data", "one"), docData, {merge:true});
     // }
-    console.log(uniqueDates);
-    console.log(approvalDates);
 
-    const filterAndPassData=(date) =>{
+    const filterAndPassData = (date) => {
         let tempDataToPass = [];
-        approvalDates.forEach((approval) =>{
-            if(approval["dateTime"].split(",")[0]===date){
+        approvalDates.forEach((approval) => {
+            if (approval[ "dateTime" ].split(",")[ 0 ] === date) {
                 tempDataToPass.push(approval);
             }
         })
-        setDataToPass(tempDataToPass);
+        return tempDataToPass;
     }
-    
-  return (
-    <div>
-        <h1>Date of Approvals </h1>
-        <ul>
-            {
-                uniqueDates.map((dat , key)=>{
-                    return (
-                        <div>
-                            <li key={key} >{dat}</li>
-                            <Link to = "/approvalname" onClick={filterAndPassData(dat)} state={{data: dataToPass}}>See</Link>
-                        </div>
- 
-                    )
-                })
-            }
-        </ul>
-    </div>
-  )
+
+    return (
+        <div>
+            <h1>Date of Approvals </h1>
+            <ul>
+                {
+                    uniqueDates.map((dat, key) => {
+                        return (
+                            <li key={key} ><Link to="/approvalname"
+                            state={{
+                                date : dat ,
+                                passData : filterAndPassData(dat)
+                            }}>{dat}</Link></li>
+                        )
+                    })
+                }
+            </ul>
+        </div>
+    )
 }
 
-export default DateApprovals
+export default DateApprovals;
