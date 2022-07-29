@@ -1,80 +1,91 @@
 import React, { useState } from 'react';
 import "./style.css";
-import {db} from "./firebase-config"
-import {collection, doc, setDoc, getDocs, query, getDoc} from "firebase/firestore";
+import { 
+  updateSubmissionStatus, 
+  updateWallet, 
+  updatePendingWallet,
+  getNotifyToken,
+  send
+} from "./FirestoreFun"
+import { Link, useParams, useLocation } from 'react-router-dom';
 
 function Approval() {
 
-  const date = "27/04/22";
-  const campName = "Instaclean";
+  const loc = useLocation();
+  const date = loc.state.date;
+  const campName = loc.state.name;
+  const approvalData = loc.state.passData;
+  const token = undefined;
+  let selectedItems=[];
 
-  const[approvals, setApprovals] = useState([]);
-
-  const getApprovalData = async () =>{
-    const querySnapShot = await getDocs(collection(db, "data"));
-    querySnapShot.forEach((doc) =>{
-      Object.keys(doc.data()).forEach((key) =>{
-        if(doc.data()[key]["campId"]!==undefined && doc.data()[key]["dateTime"].toString().split(",")[0]===date && doc.data()[key]["campRewardName"].toString().split(",")[0]===campName){
-          //Add this doc object to list
-        }
-      })
-    })
+  const approveSelected =() =>{
+    
   }
+
+  const rejectSelected=() =>{
+
+  }
+
+  const downloadCSV=() =>{
+
+  }
+
+  const deleteProvious=() =>{
+
+  } 
+
+  const searchApprovalByUser=(user)=>{
+
+  }
+
+  const selectAll=()=>{
+    
+  }
+
+  const campSubmit = {
+        campId:"25",
+        campRewardName:"Instaclean,10",
+        dateTime:"27/04/22, 05:05:10",
+        formData: ["name,Sudhanshu", "class,10"],
+        status: "Approved",
+        subCount: "1",
+        user: "rishuparashar7@gmail.com"
+};
 
   return (
     <div className="container">
       <div className="div1">
        <div className="top-left">
         <h1 className="heading">Approvals</h1>
-        <span>Axis $20</span>
+        <span>{campName}</span>
          <div className="search-div">
           <input type = "text" placeholder = "search by email-id"/>
-          <button className="select-btn" onClick={getApprovalData}>Select all</button>
+          <button className="select-btn">Select all</button>
          </div>
        </div>
        <div className="top-right">
-         <button className="btn">Download CSV</button>
+         <button className="btn" onClick={send}>Download CSV</button>
          <button className="btn">Rejected Selected</button>
-         <button className="btn">Aprrove selected</button>
+         <button className="btn" onClick={updateSubmissionStatus(campSubmit)}>Aprrove selected</button>
          <button className="delete-btn">Delete previous</button>
        </div>
       </div>
       <div className="div2">
-       <div className = "information-div">
-         <span>rishuparashar7@gmail.com</span>
-         <span>11/07/2022  19:29:11</span>
-         <button>view screenshot</button>
-       </div>
-       <div className = "information-div">
-        <span>rishuparashar7@gmail.com</span>
-        <span>11/07/2022  19:29:11</span>
-        <button>view screenshot</button>
-      </div>
-      <div className = "information-div">
-        <span>rishuparashar7@gmail.com</span>
-        <span>11/07/2022  19:29:11</span>
-        <button>view screenshot</button>
-      </div>
-      <div className = "information-div">
-        <span>rishuparashar7@gmail.com</span>
-        <span>11/07/2022  19:29:11</span>
-        <button>view screenshot</button>
-      </div>
-      <div className = "information-div">
-        <span>rishuparashar7@gmail.com</span>
-        <span>11/07/2022  19:29:11</span>
-        <button>view screenshot</button>
-      </div>
-      <div className = "information-div">
-        <span>rishuparashar7@gmail.com</span>
-        <span>11/07/2022  19:29:11</span>
-        <button>view screenshot</button>
-      </div>
-      <div className = "information-div">
-        <span>rishuparashar7@gmail.com</span>
-        <span>11/07/2022  19:29:11</span>
-        <button>view screenshot</button>
-      </div>
+        <nav>
+        <ul>
+          {
+            approvalData.map((value,key) =>{
+              return (
+                <div key={key} style={{marginBottom:"20px"}}>
+                  <li>{value.user}</li>
+                  <li>{value.dateTime}</li>
+                  <li>View Screenshot</li>
+                </div>
+              )
+            })
+          }
+        </ul>
+        </nav>
       </div>
     </div>
   )

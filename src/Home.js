@@ -15,17 +15,16 @@ function Home() {
     }
     return (
         <div>
-            <h2>Home Page</h2>
-            <h1></h1>
-            <h1></h1>
-            <h2 onClick={navToApprovalsDate}>Approvals</h2>
-            <h4></h4>
-            <h2>Redeem Request</h2>
-            <h4></h4>
-            <h2>Manage Campaings</h2>
-            <h4></h4>
-            <h2>Manage Career</h2>
-            <button onClick={logout} >Signout</button>
+            <header>
+              <h1>Admin Taskox</h1>
+            </header>
+            <nav>
+               <a onClick={navToApprovalsDate}>Manage Approvals</a>
+               <a>Manage Campaign</a>
+               <a>Redeem Requests</a>
+               <a>Manage Career</a>
+               <a onClick={logout}>Sign out</a>
+            </nav>
         </div>
     )
 }

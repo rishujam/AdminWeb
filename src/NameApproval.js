@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {db} from "./firebase-config"
 import { Link, useParams, useLocation } from 'react-router-dom';
 import {collection, doc, setDoc, getDocs, query, getDoc} from "firebase/firestore";
@@ -8,31 +8,47 @@ function NameApproval(){
     const loc = useLocation();
     const date = loc.state.date;
     const data = loc.state.passData;
+    let campNames = [];
 
-    // const getDates = async() =>{
-    //     const querySnap = await getDocs(collection(db, "data"));
-    //     querySnap.forEach((doc) =>{
-    //         Object.keys(doc.data()).forEach((key) =>{
-    //             if(doc.data()[key]["campId"]!==undefined && doc.data()[key]["dateTime"].toString().split(",")[0]===date){
-    //                 //Add this doc object to list
-    //             }
-    //         })
-    //     })
-    // }
+
+    const filterNamesFromData=() =>{
+        data.forEach((obj) =>{
+            if(!(campNames.some(item => obj["campRewardName"].split(",")[0] === item))){
+                campNames.push(obj["campRewardName"].split(",")[0]);
+            }
+        })
+    }
+    filterNamesFromData();
+
+    const filterDataToPass =(name) =>{
+        let approvals = [];
+        data.forEach((doc) =>{
+            if(doc["campRewardName"].split(",")[0]===name){
+                approvals.push(doc);
+            }
+        })
+        return approvals;
+    }
+
 
   return (
-    <div>{
-            data.map((value , key)=>{
-                return (
-                    <div key={key} style={{marginBottom:"20px"}}>
-                        <li>{`User : ${value.user}`}</li>
-                        <li>{`FormData : ${value.formData[0]}`}</li>
-                        <li>{`campRewardName : ${value.campRewardName}`}</li>
-                        <li>{`status : ${value.status}`}</li>
-                    </div>
-                )
-            })
-    }</div>
+    <div>
+        <h2>{date}</h2>
+        <ul>
+            {
+                campNames.map((value, key)=>{
+                    return (
+                        <li key={key} ><Link to="/approval"
+                            state={{
+                                date : date,
+                                name: value,
+                                passData : filterDataToPass(value)
+                            }}>{value}</Link></li>
+                    )
+                })
+            }
+        </ul>
+    </div>
   )
 }
 
