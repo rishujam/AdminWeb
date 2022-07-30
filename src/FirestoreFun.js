@@ -103,16 +103,13 @@ const requestOptions = {
     method: 'POST',
     headers: {
         'Content-Type':'application/json',
-        'Authorization': 'AIzaSyA7zJlhxKJCH3tODV5YDoq3j8adgjSumbo'
+        'Authorization': 'key=AAAA6u5VV9I:APA91bGjcEPeuJIvXkjHucizJ5CZaHyLGpmEkL-WlJaEWqfE9OHRvK-aUXjGMhHnONdepR0KCHPPuugCP9ZepbEFedr9aNN6MSECgXtJw3G3DvNo-2UII9rACfxCqF_eCkgDK-ItrVla'
     },
     body:JSON.stringify({
-        "message": {
-            "token": "faws0RvtQDm95XmG69xtOa:APA91bGa5Mp-YdsmaxNHo3KtVbM9jQWwUsnmoR0omcjpLjCTCvYm6ZCr7s7DTHygkpeJsqi3cRxPOe8Dao-A-C_JEohcY32eAbNHVPWXgDYs55aPqMQhtDVnNRLZQkqTZuvX7CtAn1qL",
-            "notification": {
-                "title": "FCM test",
-                "body": "Test"
-            }
-        }
+        "data" : {
+            "message" : "Hey I am Ved Gupta",
+        },
+        "to":"faws0RvtQDm95XmG69xtOa:APA91bGa5Mp-YdsmaxNHo3KtVbM9jQWwUsnmoR0omcjpLjCTCvYm6ZCr7s7DTHygkpeJsqi3cRxPOe8Dao-A-C_JEohcY32eAbNHVPWXgDYs55aPqMQhtDVnNRLZQkqTZuvX7CtAn1qL"
     })
 }
 
