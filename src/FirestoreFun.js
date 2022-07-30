@@ -107,15 +107,15 @@ const requestOptions = {
     },
     body:JSON.stringify({
         "data" : {
-            "message" : "Hey I am Ved Gupta",
+            "message" : "Hey bro"
         },
-        "to":"faws0RvtQDm95XmG69xtOa:APA91bGa5Mp-YdsmaxNHo3KtVbM9jQWwUsnmoR0omcjpLjCTCvYm6ZCr7s7DTHygkpeJsqi3cRxPOe8Dao-A-C_JEohcY32eAbNHVPWXgDYs55aPqMQhtDVnNRLZQkqTZuvX7CtAn1qL"
+        "to" : "faws0RvtQDm95XmG69xtOa:APA91bGa5Mp-YdsmaxNHo3KtVbM9jQWwUsnmoR0omcjpLjCTCvYm6ZCr7s7DTHygkpeJsqi3cRxPOe8Dao-A-C_JEohcY32eAbNHVPWXgDYs55aPqMQhtDVnNRLZQkqTZuvX7CtAn1qL"
     })
 }
 
 const send = async() =>{
     try{
-        fetch('https://fcm.googleapis.com/fcm/send/', requestOptions).then(response => console.log(response.json()))
+        fetch('https://fcm.googleapis.com/fcm/send', requestOptions).then(response => console.log(response.json()))
     }catch(e){
         console.log(e);
     }
