@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import "./style.css";
-import { 
+import {
   approveSubmit,
   rejectSubmit,
   deletePrevious
@@ -16,53 +16,54 @@ function Approval() {
   let approvalTodDo = [];
   let approvalDone = [];
   let approvalPrevious = [];
-  const [selectedItems, setSelectedItems]=useState([]);
+  const [ selectedItems, setSelectedItems ] = useState([]);
 
   approvalData.forEach(approval => {
-    if(approval["status"]==="Pending"){
+    if (approval[ "status" ] === "Pending") {
       approvalTodDo.push(approval);
-    }else if(approval["status"]==="Approved" || approval["status"]==="Rejected"){
+    } else if (approval[ "status" ] === "Approved" || approval[ "status" ] === "Rejected") {
       approvalDone.push(approval);
-    }else if(approval["status"]==="Deleted,Approved" || approval["status"]==="Deleted,Rejected"){
+    } else if (approval[ "status" ] === "Deleted,Approved" || approval[ "status" ] === "Deleted,Rejected") {
       approvalPrevious.push(approval);
     }
   });
 
 
 
-  const approveSelected =() =>{
+  const approveSelected = () => {
     selectedItems.forEach(element => {
-      
+
     });
   }
 
-  const rejectSelected=() =>{
+  const rejectSelected = () => {
     selectedItems.forEach(element => {
-      
+
     });
   }
 
-  const downloadCSV=() =>{
+  const downloadCSV = () => {
 
   }
 
-  const deletePrevious=() =>{
-
-  } 
-
-  const searchApprovalByUser=(user)=>{
+  const deletePrevious = () => {
 
   }
 
-  const selectAll=()=>{
-    
+  const searchApprovalByUser = (user) => {
+
   }
 
-  const cbClick=(itemValue) =>{
-    if(!selectedItems.includes(itemValue)){;
-      setSelectedItems([...selectedItems , itemValue]);
-    }else{
-      let newData1 = selectedItems.filter((item)=>{
+  const selectAll = () => {
+
+  }
+
+  const cbClick = (itemValue) => {
+    if (!selectedItems.includes(itemValue)) {
+      ;
+      setSelectedItems([ ...selectedItems, itemValue ]);
+    } else {
+      let newData1 = selectedItems.filter((item) => {
         return item !== itemValue
       });
       setSelectedItems(newData1);
@@ -70,82 +71,84 @@ function Approval() {
   }
 
   const campSubmit = {
-        campId:"25",
-        campRewardName:"Instaclean,10",
-        dateTime:"27/04/22, 05:05:10",
-        formData: ["name,Sudhanshu", "class,10"],
-        status: "Approved",
-        subCount: "1",
-        user: "rishuparashar7@gmail.com"
+    campId: "25",
+    campRewardName: "Instaclean,10",
+    dateTime: "27/04/22, 05:05:10",
+    formData: [ "name,Sudhanshu", "class,10" ],
+    status: "Approved",
+    subCount: "1",
+    user: "rishuparashar7@gmail.com"
   };
 
   return (
     <div className="container">
       <div className="div1">
-       <div className="top-left">
-        <h1 className="heading">Approvals</h1>
-        <span>{campName}</span>
-         <div className="search-div">
-          <input type = "text" placeholder = "search by email-id"/>
-          <button className="select-btn">Select all</button>
-         </div>
-       </div>
-       <div className="top-right">
-         <button className="btn" >Download CSV</button>
-         <button className="btn">Rejected Selected</button>
-         <button className="btn">Aprrove selected</button>
-         <button className="delete-btn">Delete previous</button>
-       </div>
-      </div>
-      <div className="div2">
-        <nav>
-          <h1 style={{color:'white'}}>Records</h1>
-        <ul>
-          {
-            approvalData.map((value,key) =>{
-              return (
-                <div key={key}  style={{marginBottom:"20px" , color:'white' , display : 'flex'}}>
-                  <ul style={{width : "80%"}}>
-                    <li>{value.user}</li>
-                    <li>{value.dateTime}</li>
-                    <li>View Screenshot</li>
-                  </ul>
-                  <ul >
-                    <li>
-                      <input type="checkbox" onClick={()=>{
-                        cbClick(value)
-                      }}></input>
-                    </li>
-                  </ul>
-                </div>
-              )
-            })
-          }
-        </ul>
-        </nav>
-      </div>
-      {
-        selectedItems.length > 0?
-        (
-          <div className = "div3">
-            <nav> 
-              <h1 style={{color:"white"}}>Selected People</h1>
-                <ul>
-                  {
-                    selectedItems.map((value,key) =>{
-                      return (
-                        <div key = {key} style ={{marginBottom: "20px" , color:"white"}}>
-                          <li>{value.user}</li>
-                          <li>{value.dateTime}</li>
-                        </div>
-                      )
-                    })
-                  }
-                </ul>
-              </nav>
+        <div className="top-left">
+          <h1 className="heading">Approvals</h1>
+          <span>{campName}</span>
+          <div className="search-div">
+            <input type="text" placeholder="search by email-id" />
+            <button className="select-btn">Select all</button>
           </div>
-        ):<></>
-      }
+        </div>
+        <div className="top-right">
+          <button className="btn" >Download CSV</button>
+          <button className="btn">Rejected Selected</button>
+          <button className="btn">Aprrove selected</button>
+          <button className="delete-btn">Delete previous</button>
+        </div>
+      </div>
+      <div style={{display : 'flex' , justifyContent : 'space-between'}}>
+        <div className="div2">
+          <nav>
+            <h1 style={{ color: 'white' }}>Records</h1>
+            <ul>
+              {
+                approvalData.map((value, key) => {
+                  return (
+                    <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
+                      <ul style={{ width: "80%" }}>
+                        <li>{value.user}</li>
+                        <li>{value.dateTime}</li>
+                        <li>View Screenshot</li>
+                      </ul>
+                      <ul >
+                        <li>
+                          <input type="checkbox" onClick={() => {
+                            cbClick(value)
+                          }}></input>
+                        </li>
+                      </ul>
+                    </div>
+                  )
+                })
+              }
+            </ul>
+          </nav>
+        </div>
+        <div className="div3">
+          {
+            selectedItems.length > 0 ?
+              (
+                <nav>
+                  <h1 style={{ color: "white" }}>Selected People</h1>
+                  <ul>
+                    {
+                      selectedItems.map((value, key) => {
+                        return (
+                          <div key={key} style={{ marginBottom: "20px", color: "white" }}>
+                            <li>{value.user}</li>
+                            <li>{value.dateTime}</li>
+                          </div>
+                        )
+                      })
+                    }
+                  </ul>
+                </nav>
+              ) : <></>
+          }
+        </div>
+      </div>
     </div>
   )
 }
