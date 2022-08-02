@@ -21,9 +21,10 @@ function Approval() {
   approvalData.forEach(approval => {
     if(approval["status"]==="Pending"){
       approvalTodDo.push(approval);
-    }
-    if(approval["status"]==="Approved" || approval["status"]==="Rejected"){
+    }else if(approval["status"]==="Approved" || approval["status"]==="Rejected"){
       approvalDone.push(approval);
+    }else if(approval["status"]==="Deleted,Approved" || approval["status"]==="Deleted,Rejected"){
+      approvalPrevious.push(approval);
     }
   });
 
@@ -60,7 +61,7 @@ function Approval() {
   const cbClick=(itemValue) =>{
     if(!selectedItems.includes(itemValue)){;
       setSelectedItems([...selectedItems , itemValue]);
-    }else{;
+    }else{
       let newData1 = selectedItems.filter((item)=>{
         return item !== itemValue
       });
