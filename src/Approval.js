@@ -104,12 +104,12 @@ function Approval() {
             approvalData.map((value,key) =>{
               return (
                 <div key={key}  style={{marginBottom:"20px" , color:'white' , display : 'flex'}}>
-                  <ul>
+                  <ul style={{width : "80%"}}>
                     <li>{value.user}</li>
                     <li>{value.dateTime}</li>
                     <li>View Screenshot</li>
                   </ul>
-                  <ul>
+                  <ul >
                     <li>
                       <input type="checkbox" onClick={()=>{
                         cbClick(value)
@@ -126,7 +126,7 @@ function Approval() {
       {
         selectedItems.length > 0?
         (
-          <div className = "div3" style={{marginTop : "20px"}}>
+          <div className = "div3">
             <nav> 
               <h1 style={{color:"white"}}>Selected People</h1>
                 <ul>

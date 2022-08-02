@@ -181,8 +181,10 @@ nav a {
 } */
 
 .div3{
+  margin-top: 20px;
   width: 50%;
   background-color: #D9D9D9;
+  border-radius: 20px;
 }
 
 .div2{
