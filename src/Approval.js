@@ -15,22 +15,25 @@ function Approval() {
   const date = loc.state.date;
   const campName = loc.state.name;
   const approvalData = loc.state.passData;
-  const token = undefined;
-  let selectedItems=[];
+  const [selectedItems, setSelectedItems]=useState([]);
 
   const approveSelected =() =>{
-    
+    selectedItems.forEach(element => {
+      
+    });
   }
 
   const rejectSelected=() =>{
-
+    selectedItems.forEach(element => {
+      
+    });
   }
 
   const downloadCSV=() =>{
 
   }
 
-  const deleteProvious=() =>{
+  const deletePrevious=() =>{
 
   } 
 
@@ -42,6 +45,17 @@ function Approval() {
     
   }
 
+  const cbClick=(event, itemClicked) =>{
+    if(event.target.checked){
+      // selectedItems.push(itemSelected);
+      console.log("Clicked")
+    }else{
+      // const newList = selectedItems.filter((item) => item !== itemClicked);
+      // setSelectedItems(newList);
+      console.log("UnChecked")
+    }
+  }
+
   const campSubmit = {
         campId:"25",
         campRewardName:"Instaclean,10",
@@ -50,7 +64,7 @@ function Approval() {
         status: "Approved",
         subCount: "1",
         user: "rishuparashar7@gmail.com"
-};
+  };
 
   return (
     <div className="container">
@@ -80,6 +94,7 @@ function Approval() {
                   <li>{value.user}</li>
                   <li>{value.dateTime}</li>
                   <li>View Screenshot</li>
+                  <cb><input type="checkbox" onChange={cbClick}></input></cb>
                 </div>
               )
             })
@@ -87,8 +102,26 @@ function Approval() {
         </ul>
         </nav>
       </div>
+      <div className = "div3">
+      <nav> 
+          <ul>
+            {
+              selectedItems.map((value,key) =>{
+                return (
+                  <div key = {key} style ={{marginBottom: "20px"}}>
+                    <li>{value.user}</li>
+                    <li>{value.dateTime}</li>
+                  </div>
+                )
+              })
+            }
+          </ul>
+        </nav>
+      </div>
     </div>
   )
 }
+
+// To Ask: UI, SelectedItems wale function mai param kaise pass kare
 
 export default Approval

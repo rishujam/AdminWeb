@@ -89,6 +89,7 @@ const getFatherUser =(user, fatherUser) => async() =>{
         console.log(e);
     }
 }
+// till now 7 operations
 
 const addToReferAmount = (user, amount) => async() =>{
     try{
@@ -107,7 +108,7 @@ const requestOptions = {
     },
     body:JSON.stringify({
         "data" : {
-            "message" : "Hey bro"
+            "message" : "Hey"
         },
         "to" : "faws0RvtQDm95XmG69xtOa:APA91bGa5Mp-YdsmaxNHo3KtVbM9jQWwUsnmoR0omcjpLjCTCvYm6ZCr7s7DTHygkpeJsqi3cRxPOe8Dao-A-C_JEohcY32eAbNHVPWXgDYs55aPqMQhtDVnNRLZQkqTZuvX7CtAn1qL"
     })
@@ -115,12 +116,15 @@ const requestOptions = {
 
 const send = async() =>{
     try{
-        fetch('https://fcm.googleapis.com/fcm/send', requestOptions).then(response => console.log(response.json()))
+        await fetch('https://fcm.googleapis.com/fcm/send', requestOptions).then(response => console.log(response.json()))
     }catch(e){
         console.log(e);
     }
 }
 
+const approveSubmit=async() =>{
+    
+}
 
 export {
     updateSubmissionStatus, 
@@ -128,5 +132,6 @@ export {
     updatePendingWallet, 
     getNotifyToken,
     getFatherUser,
-    send
+    send,
+    approveSubmit
 }
