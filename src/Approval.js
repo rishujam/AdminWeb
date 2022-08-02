@@ -45,14 +45,14 @@ function Approval() {
     
   }
 
-  const cbClick=(event, itemClicked) =>{
-    if(event.target.checked){
-      // selectedItems.push(itemSelected);
-      console.log("Clicked")
-    }else{
-      // const newList = selectedItems.filter((item) => item !== itemClicked);
-      // setSelectedItems(newList);
-      console.log("UnChecked")
+  const cbClick=(itemValue) =>{
+    if(!selectedItems.includes(itemValue)){;
+      setSelectedItems([...selectedItems , itemValue]);
+    }else{;
+      let newData1 = selectedItems.filter((item)=>{
+        return item !== itemValue
+      });
+      setSelectedItems(newData1);
     }
   }
 
@@ -86,15 +86,24 @@ function Approval() {
       </div>
       <div className="div2">
         <nav>
+          <h1 style={{color:'white'}}>Records</h1>
         <ul>
           {
             approvalData.map((value,key) =>{
               return (
-                <div key={key} style={{marginBottom:"20px"}}>
-                  <li>{value.user}</li>
-                  <li>{value.dateTime}</li>
-                  <li>View Screenshot</li>
-                  <cb><input type="checkbox" onChange={cbClick}></input></cb>
+                <div key={key}  style={{marginBottom:"20px" , color:'white' , display : 'flex'}}>
+                  <ul>
+                    <li>{value.user}</li>
+                    <li>{value.dateTime}</li>
+                    <li>View Screenshot</li>
+                  </ul>
+                  <ul>
+                    <li>
+                      <input type="checkbox" onClick={()=>{
+                        cbClick(value)
+                      }}></input>
+                    </li>
+                  </ul>
                 </div>
               )
             })
@@ -102,22 +111,28 @@ function Approval() {
         </ul>
         </nav>
       </div>
-      <div className = "div3">
-      <nav> 
-          <ul>
-            {
-              selectedItems.map((value,key) =>{
-                return (
-                  <div key = {key} style ={{marginBottom: "20px"}}>
-                    <li>{value.user}</li>
-                    <li>{value.dateTime}</li>
-                  </div>
-                )
-              })
-            }
-          </ul>
-        </nav>
-      </div>
+      {
+        selectedItems.length > 0?
+        (
+          <div className = "div3" style={{marginTop : "20px"}}>
+            <nav> 
+              <h1 style={{color:"white"}}>Selected People</h1>
+                <ul>
+                  {
+                    selectedItems.map((value,key) =>{
+                      return (
+                        <div key = {key} style ={{marginBottom: "20px" , color:"white"}}>
+                          <li>{value.user}</li>
+                          <li>{value.dateTime}</li>
+                        </div>
+                      )
+                    })
+                  }
+                </ul>
+              </nav>
+          </div>
+        ):<></>
+      }
     </div>
   )
 }
