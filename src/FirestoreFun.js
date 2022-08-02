@@ -1,11 +1,16 @@
 import { db, messaging } from "./firebase-config"
-import { collection, doc, setDoc, getDocs, query, getDoc, updateDoc, increment } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, query, getDoc, updateDoc } from "firebase/firestore";
+import { getStorage, ref, deleteObject} from "firebase/storage";
+import { async } from "@firebase/util";
+
+
+const storage = getStorage();
 
 const updateSubmissionStatus=campSubmit => async() => {
     try{
         const docRef = doc(db, "promoCampPerformed", campSubmit["user"]);
         var obj = {};
-        const key= `${campSubmit["campId"]},${campSubmit["subCount"]}`;
+        const key = `${campSubmit["campId"]},${campSubmit["subCount"]}`;
         obj[key] = campSubmit;
         await updateDoc(docRef, obj);
     }catch(e){
@@ -63,38 +68,44 @@ const updatePendingWallet =(user, amount) => async()=>{
     }
 }
 
-const getNotifyToken= (user,token) =>async() =>{
+const getNotifyToken= (user) =>async() =>{
     try{
+        let token = ""
         const docRef = doc(db, "utils",`token${user}`);
         let document = await getDoc(docRef);
         if(document.exists()){
             token = document.data()["token"];
-        }else{
-            token = undefined;
         }
-        console.log(token);
+        return token
     }catch(e){
         console.log(e);
     }
 }
 
-const getFatherUser =(user, fatherUser) => async() =>{
+const getFatherUser =(user) => async() =>{
     try{
         const docRef = doc(db,"refer", "child-parent");
         let document = await getDoc(docRef);
         if(document.exists()){
-            fatherUser = document.data()[user];
+            let fatherUser = document.data()[user];
+            return fatherUser;
         }
+        return undefined;
     }catch(e){
         console.log(e);
     }
 }
-// till now 7 operations
 
 const addToReferAmount = (user, amount) => async() =>{
     try{
-        const docRef = doc(db, "refer", "earnings")
-        
+        const docRef = doc(db, "refer", "userEarnings")
+        let document = await getDoc(docRef);
+        let oldAmount = 0
+        if(document.data()[user]!==undefined){
+            oldAmount = document.data()[user];
+        }
+        let newAmount = oldAmount+amount;
+        await setDoc(docRef, {user:newAmount},{merge:true})
     }catch(e){
         console.log(e);
     }
@@ -108,13 +119,15 @@ const requestOptions = {
     },
     body:JSON.stringify({
         "data" : {
-            "message" : "Hey"
+            "message" : ""
         },
-        "to" : "faws0RvtQDm95XmG69xtOa:APA91bGa5Mp-YdsmaxNHo3KtVbM9jQWwUsnmoR0omcjpLjCTCvYm6ZCr7s7DTHygkpeJsqi3cRxPOe8Dao-A-C_JEohcY32eAbNHVPWXgDYs55aPqMQhtDVnNRLZQkqTZuvX7CtAn1qL"
+        "to" : ""
     })
 }
 
-const send = async() =>{
+const sendNotification =(token, message)=> async() =>{
+    requestOptions["body"]["to"] = token
+    requestOptions["body"]["data"]["message"] = message
     try{
         await fetch('https://fcm.googleapis.com/fcm/send', requestOptions).then(response => console.log(response.json()))
     }catch(e){
@@ -122,16 +135,47 @@ const send = async() =>{
     }
 }
 
-const approveSubmit=async() =>{
-    
+const approveSubmit=(campSubmit) => async() =>{
+    const amount = Number(campSubmit["campRewardName"].split(",")[1]);
+    updateSubmissionStatus(campSubmit);
+    updateWallet(campSubmit["user"],amount,"+")
+    updatePendingWallet(campSubmit["user"], amount)
+    const token = getNotifyToken(campSubmit["user"])
+    if(token!==undefined){
+        sendNotification(token, `₹${amount} Added to Wallet`)
+    }
+    const refAmount = amount/10;
+    if(refAmount>0){
+        const fatherUser = getFatherUser(campSubmit["user"])
+        if(fatherUser!==undefined){
+            updateWallet(fatherUser, refAmount)
+            addToReferAmount(fatherUser,refAmount)
+            const fatherToken = getNotifyToken(fatherUser)
+            if(fatherToken!==undefined){
+                sendNotification(fatherToken, `₹${refAmount} Added to Wallet as referral earnings`)
+            }
+        }
+    }
+}
+
+const rejectSubmit =(campSubmit) => async() =>{
+    const amount = Number(campSubmit["campRewardName"].split(",")[1]);
+    updateSubmissionStatus(campSubmit)
+    updatePendingWallet(campSubmit["user"], amount)
+}
+
+const deletePrevious=(campSubmit)=> async()=>{
+    const fileRef = ref(storage, `proofCampPromo/${campSubmit["user"]},${campSubmit["campId"]},${campSubmit["subCount"]}`)
+    deleteObject(fileRef).then(() =>{
+        console.log("FileDeleted");
+    }).catch((error) =>{
+        console.log(error);
+    })
+    updateSubmissionStatus(campSubmit);
 }
 
 export {
-    updateSubmissionStatus, 
-    updateWallet, 
-    updatePendingWallet, 
-    getNotifyToken,
-    getFatherUser,
-    send,
-    approveSubmit
+    approveSubmit,
+    rejectSubmit,
+    deletePrevious
 }

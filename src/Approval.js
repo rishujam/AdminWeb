@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import "./style.css";
 import { 
-  updateSubmissionStatus, 
-  updateWallet, 
-  updatePendingWallet,
-  getNotifyToken,
-  send
+  approveSubmit,
+  rejectSubmit,
+  deletePrevious
 } from "./FirestoreFun"
 import { Link, useParams, useLocation } from 'react-router-dom';
 
@@ -15,7 +13,21 @@ function Approval() {
   const date = loc.state.date;
   const campName = loc.state.name;
   const approvalData = loc.state.passData;
+  let approvalTodDo = [];
+  let approvalDone = [];
+  let approvalPrevious = [];
   const [selectedItems, setSelectedItems]=useState([]);
+
+  approvalData.forEach(approval => {
+    if(approval["status"]==="Pending"){
+      approvalTodDo.push(approval);
+    }
+    if(approval["status"]==="Approved" || approval["status"]==="Rejected"){
+      approvalDone.push(approval);
+    }
+  });
+
+
 
   const approveSelected =() =>{
     selectedItems.forEach(element => {
@@ -78,9 +90,9 @@ function Approval() {
          </div>
        </div>
        <div className="top-right">
-         <button className="btn" onClick={send}>Download CSV</button>
+         <button className="btn" >Download CSV</button>
          <button className="btn">Rejected Selected</button>
-         <button className="btn" onClick={updateSubmissionStatus(campSubmit)}>Aprrove selected</button>
+         <button className="btn">Aprrove selected</button>
          <button className="delete-btn">Delete previous</button>
        </div>
       </div>
@@ -137,6 +149,6 @@ function Approval() {
   )
 }
 
-// To Ask: UI, SelectedItems wale function mai param kaise pass kare
+// To Ask: UI, SelectedItems wale function mai param kaise pass kare, Waiting for first function to finish
 
 export default Approval
