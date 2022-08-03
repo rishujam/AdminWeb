@@ -15,8 +15,8 @@ function Approval() {
   const approvalData = loc.state.passData;
   let approvalPending = [];
   let approvalDone = [];
-  let approvalPrevious = [];
   let dataToShow = [];
+  const [ searchedItems, setSearchedItems ] = useState([]);
   const [ selectedItems, setSelectedItems ] = useState([]);
 
   approvalData.forEach(approval => {
@@ -24,11 +24,8 @@ function Approval() {
       approvalPending.push(approval);
     } else if (approval[ "status" ] === "Approved" || approval[ "status" ] === "Rejected") {
       approvalDone.push(approval);
-    } else if (approval[ "status" ] === "Deleted,Approved" || approval[ "status" ] === "Deleted,Rejected") {
-      approvalPrevious.push(approval);
     }
   });
-
   approvalPending.forEach(element => {
     dataToShow.push(element)
   });
@@ -55,18 +52,19 @@ function Approval() {
   }
 
   const deletePrevious = () => {
-    approvalPrevious.forEach(element => {
+    approvalDone.forEach(element => {
       deletePrevious(element);
     });
-    
   }
 
   const searchApprovalByUser = (user) => {
+    let data = [];
     approvalPending.forEach(element => {
       if(element["user"]===user){
-        dataToShow.push(element);
+        data.push(element);
       }
     });
+    setSearchedItems(data);
   }
 
   const cbClick = (itemValue) => {
@@ -81,14 +79,34 @@ function Approval() {
     }
   }
 
-  const removeFromSelectedItems = (itemValue)=>{
-    console.log("clicked")
-    if(selectedItems.includes(itemValue)){
-      let newData2 = selectedItems.filter((item) => {
-        return item !== itemValue
-      });
-      setSelectedItems(newData2);
+  const showCb=(value) =>{
+    if(value["status"]==="Pending"){
+      return (
+        <input type="checkbox" onClick={() => {
+          cbClick(value)
+        }}></input>
+      )
+    }else if(value["status"]==="Approved"){
+      return (
+        <h5 style={{paddingRight:"16px", fontWeight:"400"}}>Approved</h5>
+      )
+    }else if(value["status"]==="Rejected"){
+      return (
+        <h5 style={{paddingRight:"16px", fontWeight:"400"}}>Rejected</h5>
+      )
     }
+    
+  }
+
+
+  const removeFromSelectedItems = (itemValue)=>{
+    // console.log("clicked")
+    // if(selectedItems.includes(itemValue)){
+    //   let newData2 = selectedItems.filter((item) => {
+    //     return item !== itemValue
+    //   });
+    //   setSelectedItems(newData2);
+    // }
   }
 
   const campSubmit = {
@@ -132,14 +150,10 @@ function Approval() {
                       <ul style={{ width: "80%" }}>
                         <li>{value.user}</li>
                         <li>{value.dateTime}</li>
-                        <li>View Screenshot</li>
+                        <li style={{fontWeight:"bold", color:"#EEEEEE"}}>View Screenshot</li>
                       </ul>
                       <ul>
-                        <li>
-                          <input type="checkbox" onClick={() => {
-                            cbClick(value)
-                          }}></input>
-                        </li>
+                        {showCb(value)}
                       </ul>
                     </div>
                   )
@@ -182,7 +196,6 @@ function Approval() {
 
 // Waiting for first function to finish, 
 //Set data dynamically to views, 
-//view checkbox only if status is pending,
 //
 // refresh data once rejected or approved,
 
