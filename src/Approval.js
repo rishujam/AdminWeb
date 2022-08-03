@@ -57,9 +57,8 @@ function Approval() {
     });
   }
 
-  const cbClick = (itemValue) => {
-    if (!selectedItems.includes(itemValue)) {
-      ;
+  const cbClick = (event , itemValue) => {
+    if (event.target.checked) {
       setSelectedItems([ ...selectedItems, itemValue ]);
     } else {
       let newData1 = selectedItems.filter((item) => {
@@ -72,8 +71,8 @@ function Approval() {
   const showCb=(value) =>{
     if(value["status"]==="Pending"){
       return (
-        <input type="checkbox" onClick={() => {
-          cbClick(value)
+        <input type="checkbox" onChange={(event) => {
+          cbClick(event,value)
         }}></input>
       )
     }else if(value["status"]==="Approved"){
