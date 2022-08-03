@@ -13,14 +13,15 @@ function Approval() {
   const date = loc.state.date;
   const campName = loc.state.name;
   const approvalData = loc.state.passData;
-  let approvalTodDo = [];
+  let approvalPending = [];
   let approvalDone = [];
   let approvalPrevious = [];
+  let dataToShow = [];
   const [ selectedItems, setSelectedItems ] = useState([]);
 
   approvalData.forEach(approval => {
     if (approval[ "status" ] === "Pending") {
-      approvalTodDo.push(approval);
+      approvalPending.push(approval);
     } else if (approval[ "status" ] === "Approved" || approval[ "status" ] === "Rejected") {
       approvalDone.push(approval);
     } else if (approval[ "status" ] === "Deleted,Approved" || approval[ "status" ] === "Deleted,Rejected") {
@@ -28,18 +29,25 @@ function Approval() {
     }
   });
 
-
+  approvalPending.forEach(element => {
+    dataToShow.push(element)
+  });
+  approvalDone.forEach(element =>{
+    dataToShow.push(element)
+  });
 
   const approveSelected = () => {
     selectedItems.forEach(element => {
-
+      approveSubmit(element);
     });
+    setSelectedItems([]);
   }
 
   const rejectSelected = () => {
     selectedItems.forEach(element => {
-
+      rejectSubmit(element);
     });
+    setSelectedItems([]);
   }
 
   const downloadCSV = () => {
@@ -47,15 +55,18 @@ function Approval() {
   }
 
   const deletePrevious = () => {
-
+    approvalPrevious.forEach(element => {
+      deletePrevious(element);
+    });
+    
   }
 
   const searchApprovalByUser = (user) => {
-
-  }
-
-  const selectAll = () => {
-
+    approvalPending.forEach(element => {
+      if(element["user"]===user){
+        dataToShow.push(element);
+      }
+    });
   }
 
   const cbClick = (itemValue) => {
@@ -67,6 +78,16 @@ function Approval() {
         return item !== itemValue
       });
       setSelectedItems(newData1);
+    }
+  }
+
+  const removeFromSelectedItems = (itemValue)=>{
+    console.log("clicked")
+    if(selectedItems.includes(itemValue)){
+      let newData2 = selectedItems.filter((item) => {
+        return item !== itemValue
+      });
+      setSelectedItems(newData2);
     }
   }
 
@@ -88,7 +109,8 @@ function Approval() {
           <span>{campName}</span>
           <div className="search-div">
             <input type="text" placeholder="search by email-id" />
-            <button className="select-btn">Select all</button>
+            <button onClick={searchApprovalByUser}>Search</button>
+            <img src={require('./undo.png')} style={{width:"25px", height:"20px", marginLeft:"12px"}} />
           </div>
         </div>
         <div className="top-right">
@@ -104,7 +126,7 @@ function Approval() {
             <h1 style={{ color: 'white' }}>Records</h1>
             <ul>
               {
-                approvalData.map((value, key) => {
+                dataToShow.map((value, key) => {
                   return (
                     <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
                       <ul style={{ width: "80%" }}>
@@ -112,7 +134,7 @@ function Approval() {
                         <li>{value.dateTime}</li>
                         <li>View Screenshot</li>
                       </ul>
-                      <ul >
+                      <ul>
                         <li>
                           <input type="checkbox" onClick={() => {
                             cbClick(value)
@@ -136,9 +158,14 @@ function Approval() {
                     {
                       selectedItems.map((value, key) => {
                         return (
-                          <div key={key} style={{ marginBottom: "20px", color: "white" }}>
-                            <li>{value.user}</li>
-                            <li>{value.dateTime}</li>
+                          <div key={key} style={{ marginBottom: "20px", color: "white", display:"flex"}}>
+                            <ul style={{ width: "80%" }}>
+                              <li>{value.user}</li>
+                              <li>{value.dateTime}</li>
+                            </ul>
+                            <ul>
+                              <li onClick={removeFromSelectedItems(value)}><img src={require('./delete.png')} style={{width:"30px", height:"30px"}}/></li>
+                            </ul>
                           </div>
                         )
                       })
@@ -153,6 +180,10 @@ function Approval() {
   )
 }
 
-// To Ask: UI, SelectedItems wale function mai param kaise pass kare, Waiting for first function to finish
+// Waiting for first function to finish, 
+//Set data dynamically to views, 
+//view checkbox only if status is pending,
+//
+// refresh data once rejected or approved,
 
 export default Approval
