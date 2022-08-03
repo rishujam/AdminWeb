@@ -16,7 +16,7 @@ function Approval() {
   let approvalPending = [];
   let approvalDone = [];
   let dataToShow = [];
-  const [ searchedItems, setSearchedItems ] = useState([]);
+  const [ searched, setSearched ] = useState("");
   const [ selectedItems, setSelectedItems ] = useState([]);
 
   approvalData.forEach(approval => {
@@ -55,16 +55,6 @@ function Approval() {
     approvalDone.forEach(element => {
       deletePrevious(element);
     });
-  }
-
-  const searchApprovalByUser = (user) => {
-    let data = [];
-    approvalPending.forEach(element => {
-      if(element["user"]===user){
-        data.push(element);
-      }
-    });
-    setSearchedItems(data);
   }
 
   const cbClick = (itemValue) => {
@@ -126,8 +116,9 @@ function Approval() {
           <h1 className="heading">Approvals</h1>
           <span>{campName}</span>
           <div className="search-div">
-            <input type="text" placeholder="search by email-id" />
-            <button onClick={searchApprovalByUser}>Search</button>
+            <input type="text" value={searched} onChange={(e)=>{
+              setSearched(e.target.value)
+            }} placeholder="search by email-id" />
             <img src={require('./undo.png')} style={{width:"25px", height:"20px", marginLeft:"12px"}} />
           </div>
         </div>
@@ -144,20 +135,39 @@ function Approval() {
             <h1 style={{ color: 'white' }}>Records</h1>
             <ul>
               {
-                dataToShow.map((value, key) => {
-                  return (
-                    <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
-                      <ul style={{ width: "80%" }}>
-                        <li>{value.user}</li>
-                        <li>{value.dateTime}</li>
-                        <li style={{fontWeight:"bold", color:"#EEEEEE"}}>View Screenshot</li>
-                      </ul>
-                      <ul>
-                        {showCb(value)}
-                      </ul>
-                    </div>
-                  )
-                })
+                searched == "" ? (
+                  dataToShow.map((value, key) => {
+                    return (
+                      <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
+                        <ul style={{ width: "80%" }}>
+                          <li>{value.user}</li>
+                          <li>{value.dateTime}</li>
+                          <li style={{fontWeight:"bold", color:"#EEEEEE"}}>View Screenshot</li>
+                        </ul>
+                        <ul>
+                          {showCb(value)}
+                        </ul>
+                      </div>
+                    )
+                  })
+                ):(
+                  dataToShow.map((value, key) => {
+                    if(value.user.includes(searched)){
+                      return (
+                        <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
+                          <ul style={{ width: "80%" }}>
+                            <li>{value.user}</li>
+                            <li>{value.dateTime}</li>
+                            <li style={{fontWeight:"bold", color:"#EEEEEE"}}>View Screenshot</li>
+                          </ul>
+                          <ul>
+                            {showCb(value)}
+                          </ul>
+                        </div>
+                      )
+                    }
+                  })
+                )
               }
             </ul>
           </nav>
