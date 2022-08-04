@@ -3,37 +3,33 @@ import { collection, doc, setDoc, getDocs, query, getDoc, updateDoc } from "fire
 import { getStorage, ref, deleteObject} from "firebase/storage";
 import { async } from "@firebase/util";
 
-
 const storage = getStorage();
 
-const updateSubmissionStatus= async(campSubmit) => {
+const updateSubmissionStatus= async(campSubmit,status) => {
+    campSubmit["status"]=status;
     try{
-        // console.log(campSubmit);
-        const docRef = await doc(db, "promoCampPerformed", campSubmit["user"]);
+        const docRef = doc(db, "promoCampPerformed", campSubmit["user"]);
         var obj = {};
         const key = `${campSubmit["campId"]},${campSubmit["subCount"]}`;
         obj[key] = campSubmit;
         await updateDoc(docRef, obj);
+        console.log("UpdateSubmitDone")
     }catch(e){
         console.log(e);
     }
 }
 
 const updateWallet =  async(user,amount, operator) =>{
-    amount = Number(amount);
     try{
-        const docRef = await doc(db, "wallet", user);
+        const docRef = doc(db, "wallet", user);
         let document = await getDoc(docRef);
         let currentAmount = 0;
         if(document.exists()){
-            currentAmount = Number(document.data()["Total"]);
+            currentAmount = document.data()["Total"];
             if(currentAmount===undefined){
                 currentAmount= 0;
             }
-        }else{
-            currentAmount=0;
         }
-        console.log(currentAmount);
         let newAmount = currentAmount+amount;
         if(operator==="-"){
             newAmount=currentAmount-amount;
@@ -41,8 +37,8 @@ const updateWallet =  async(user,amount, operator) =>{
                 newAmount=0;
             }
         }
-        console.log(newAmount);
-        await setDoc(await doc(db, "wallet", user), {Total:newAmount}); 
+        await setDoc(doc(db, "wallet", user), {Total:newAmount}); 
+        console.log("updateWalletDone");
     }catch(e){
         console.log(e);
     }
@@ -50,7 +46,7 @@ const updateWallet =  async(user,amount, operator) =>{
 
 const updatePendingWallet = async(user, amount)=>{
     try{
-        const docRef = await doc(db, "pendingAmount", user);
+        const docRef = doc(db, "pendingAmount", user);
         let document = await getDoc(docRef);
         let pendAmount= 0;
         if(document.exists()){
@@ -65,6 +61,7 @@ const updatePendingWallet = async(user, amount)=>{
         if(newAmount>=0){
             await updateDoc(docRef, {Total: newAmount});
         }
+        console.log("updatePendingDone")
     }catch(e){
         console.log(e);
     }
@@ -73,11 +70,12 @@ const updatePendingWallet = async(user, amount)=>{
 const getNotifyToken = async(user) =>{
     try{
         let token = ""
-        const docRef =await doc(db, "utils",`token${user}`);
+        const docRef = doc(db, "utils",`token${user}`);
         let document = await getDoc(docRef);
         if(document.exists()){
             token = document.data()["token"];
         }
+        console.log("getTokenDone")
         return token
     }catch(e){
         console.log(e);
@@ -86,12 +84,14 @@ const getNotifyToken = async(user) =>{
 
 const getFatherUser = async(user) =>{
     try{
-        const docRef =await doc(db,"refer", "child-parent");
+        const docRef = doc(db,"refer", "child-parent");
         let document = await getDoc(docRef);
         if(document.exists()){
             let fatherUser = document.data()[user];
+            console.log("getFatherDone")
             return fatherUser;
         }
+        console.log("getFatherDone")
         return undefined;
     }catch(e){
         console.log(e);
@@ -100,7 +100,7 @@ const getFatherUser = async(user) =>{
 
 const addToReferAmount =  async(user, amount) =>{
     try{
-        const docRef =await doc(db, "refer", "userEarnings")
+        const docRef = doc(db, "refer", "userEarnings")
         let document = await getDoc(docRef);
         let oldAmount = 0
         if(document.data()[user]!==undefined){
@@ -108,6 +108,7 @@ const addToReferAmount =  async(user, amount) =>{
         }
         let newAmount = oldAmount+amount;
         await setDoc(docRef, {user:newAmount},{merge:true})
+        console.log("addToReferAmountDone")
     }catch(e){
         console.log(e);
     }
@@ -132,15 +133,15 @@ const sendNotification = async(token, message) =>{
         await fetch('https://fcm.googleapis.com/fcm/send', requestOptions)
         .then(response => response.json())
         .then(response => console.log(response))
+        console.log("sendNotificationDone")
     }catch(e){
         console.log(e);
     }
 }
 
 const approveSubmit = async(campSubmit) =>{
-    // console.log(campSubmit)
     const amount = Number(campSubmit["campRewardName"].split(",")[1]);
-    await updateSubmissionStatus(campSubmit);
+    await updateSubmissionStatus(campSubmit, "Approved");
     await updateWallet(campSubmit["user"],amount,"+")
     await updatePendingWallet(campSubmit["user"], amount)
     const token = await getNotifyToken(campSubmit["user"])
@@ -148,33 +149,31 @@ const approveSubmit = async(campSubmit) =>{
         await sendNotification(token, `₹${amount} Added to Wallet`)
     }
     const refAmount = amount/10;
-    if(refAmount>0){
-        const fatherUser = getFatherUser(campSubmit["user"])
-        if(fatherUser!==undefined){
-            await updateWallet(fatherUser, refAmount)
-            await addToReferAmount(fatherUser,refAmount)
-            const fatherToken = await getNotifyToken(fatherUser)
-            if(fatherToken!==undefined){
-                await sendNotification(fatherToken, `₹${refAmount} Added to Wallet as referral earnings`)
-            }
+    const fatherUser = await getFatherUser(campSubmit["user"])
+    if(fatherUser!==undefined){
+        await updateWallet(fatherUser, refAmount)
+        await addToReferAmount(fatherUser,refAmount)
+        const fatherToken = await getNotifyToken(fatherUser)
+        if(fatherToken!==undefined){
+            await sendNotification(fatherToken, `₹${refAmount} Added to Wallet as referral earnings`)
         }
     }
 }
 
 const rejectSubmit = async(campSubmit) =>{
     const amount = Number(campSubmit["campRewardName"].split(",")[1]);
-    updateSubmissionStatus(campSubmit)
-    updatePendingWallet(campSubmit["user"], amount)
+    await updateSubmissionStatus(campSubmit,"Rejected")
+    await updatePendingWallet(campSubmit["user"], amount)
 }
 
 const deletePrevious = async(campSubmit)=>{
     const fileRef = ref(storage, `proofCampPromo/${campSubmit["user"]},${campSubmit["campId"]},${campSubmit["subCount"]}`)
-    deleteObject(fileRef).then(() =>{
+    await deleteObject(fileRef).then(() =>{
         console.log("FileDeleted");
     }).catch((error) =>{
         console.log(error);
     })
-    updateSubmissionStatus(campSubmit);
+    await updateSubmissionStatus(campSubmit,`Deleted,${campSubmit["status"]}`);
 }
 
 export {
