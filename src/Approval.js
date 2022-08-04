@@ -33,10 +33,10 @@ function Approval() {
     dataToShow.push(element)
   });
 
-  const approveSelected = () => {
-    console.log("Started")
-    selectedItems.forEach(element => {
-      approveSubmit(element);
+  const approveSelected = async() => {
+    console.log("Started");
+    await selectedItems.forEach(async(element) => {
+      await approveSubmit(element);
     });
   }
 
@@ -88,7 +88,7 @@ function Approval() {
 
 
   const removeFromSelectedItems = (itemValue)=>{
-    console.log("clicked")
+    // console.log("clicked")
     if(selectedItems.includes(itemValue)){
       let newData2 = selectedItems.filter((item) => {
         return item !== itemValue
