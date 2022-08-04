@@ -35,7 +35,7 @@ function Approval() {
 
   const approveSelected = async() => {
     console.log("Started");
-    await selectedItems.forEach(async(element) => {
+    selectedItems.forEach(async(element) => {
       await approveSubmit(element);
     });
   }
@@ -202,7 +202,6 @@ function Approval() {
   )
 }
 
-// Waiting for first function to finish, 
 // Loading % bar
 // refresh data once rejected or approved,
 
