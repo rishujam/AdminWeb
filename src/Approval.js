@@ -34,21 +34,20 @@ function Approval() {
   });
 
   const approveSelected = () => {
+    console.log("Started")
     selectedItems.forEach(element => {
       approveSubmit(element);
     });
-    setSelectedItems([]);
   }
 
   const rejectSelected = () => {
     selectedItems.forEach(element => {
       rejectSubmit(element);
     });
-    setSelectedItems([]);
   }
 
   const downloadCSV = () => {
-
+    
   }
 
   const deletePrevious = () => {
@@ -89,13 +88,13 @@ function Approval() {
 
 
   const removeFromSelectedItems = (itemValue)=>{
-    // console.log("clicked")
-    // if(selectedItems.includes(itemValue)){
-    //   let newData2 = selectedItems.filter((item) => {
-    //     return item !== itemValue
-    //   });
-    //   setSelectedItems(newData2);
-    // }
+    console.log("clicked")
+    if(selectedItems.includes(itemValue)){
+      let newData2 = selectedItems.filter((item) => {
+        return item !== itemValue
+      });
+      // setSelectedItems(newData2);
+    }
   }
 
   const campSubmit = {
@@ -124,7 +123,7 @@ function Approval() {
         <div className="top-right">
           <button className="btn" >Download CSV</button>
           <button className="btn">Rejected Selected</button>
-          <button className="btn">Aprrove selected</button>
+          <button className="btn" onClick={approveSelected}>Aprrove selected</button>
           <button className="delete-btn">Delete previous</button>
         </div>
       </div>
@@ -204,8 +203,7 @@ function Approval() {
 }
 
 // Waiting for first function to finish, 
-//Set data dynamically to views, 
-//
+// Loading % bar
 // refresh data once rejected or approved,
 
 export default Approval
