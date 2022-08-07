@@ -39,13 +39,13 @@ function Approval() {
     let progress = 0;
     let eachProgress = 100 / selectedItems.length;
     console.log("Approval Started");
-    await Promise.all(selectedItems.map(async(ele)=>{
+    await Promise.all(selectedItems.map(async (ele) => {
       await approveSubmit(ele);
       progress += eachProgress;
       setProgressState(progress);
     }));
     setProgressState(0);
-    
+
   }
 
   const rejectSelected = () => {
@@ -213,8 +213,16 @@ function Approval() {
               </div>
             </div>
           </div>
-        ):(
-          <h1>{progressState}</h1>
+        ) : (
+          <div style={{display:"flex" , alignItems:"center" , justifyContent : "center"}}>
+          <div className="loadingio-spinner-spinner-d5vda8qm7j5"><div className="ldio-9u8gbddmqad">
+            <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+          </div>
+          <div>
+            <h1>{progressState}</h1>
+          </div>
+          </div>
         )
       }
     </>
