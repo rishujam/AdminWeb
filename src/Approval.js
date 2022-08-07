@@ -120,7 +120,7 @@ function Approval() {
   return (
     <>
       {
-        progressState !== 0 ? (
+        progressState === 0 ? (
           <div className="container">
             <div className="div1">
               <div className="top-left">
