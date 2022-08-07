@@ -18,6 +18,8 @@ function Approval() {
   let dataToShow = [];
   const [ searched, setSearched ] = useState("");
   const [ selectedItems, setSelectedItems ] = useState([]);
+  const [ progressState, setProgressState ] = useState(0);
+
 
   approvalData.forEach(approval => {
     if (approval[ "status" ] === "Pending") {
@@ -34,26 +36,33 @@ function Approval() {
   });
 
   const approveSelected = async() => {
-    console.log("Started");
+    let progress = 0;
+    let eachProgress = 100/selectedItems.length;
+    console.log("Approval Started");
     selectedItems.forEach(async(element) => {
       await approveSubmit(element);
+      progress+=eachProgress;
+      setProgressState(progress);
     });
+    //Empty selectedItems and redirect to Dates page
   }
 
   const rejectSelected = () => {
+    console.log("Rejection Started")
     selectedItems.forEach(element => {
       rejectSubmit(element);
     });
+    //Empty selectedItems and redirect to Dates page
   }
 
   const downloadCSV = () => {
-    
   }
 
   const deletePrevious = () => {
     approvalDone.forEach(element => {
       deletePrevious(element);
     });
+    //Empty selectedItems and redirect to Dates page
   }
 
   const cbClick = (event , itemValue) => {
@@ -83,9 +92,7 @@ function Approval() {
         <h5 style={{paddingRight:"16px", fontWeight:"400"}}>Rejected</h5>
       )
     }
-    
   }
-
 
   const removeFromSelectedItems = (itemValue)=>{
     // console.log("clicked")
@@ -122,11 +129,12 @@ function Approval() {
         </div>
         <div className="top-right">
           <button className="btn" >Download CSV</button>
-          <button className="btn">Rejected Selected</button>
+          <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
           <button className="btn" onClick={approveSelected}>Aprrove selected</button>
           <button className="delete-btn">Delete previous</button>
         </div>
       </div>
+    
       <div style={{display : 'flex' , justifyContent : 'space-between'}}>
         <div className="div2">
           <nav>
