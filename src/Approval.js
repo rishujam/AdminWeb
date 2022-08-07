@@ -31,20 +31,21 @@ function Approval() {
   approvalPending.forEach(element => {
     dataToShow.push(element)
   });
-  approvalDone.forEach(element =>{
+  approvalDone.forEach(element => {
     dataToShow.push(element)
   });
 
-  const approveSelected = async() => {
+  const approveSelected = async () => {
     let progress = 0;
-    let eachProgress = 100/selectedItems.length;
+    let eachProgress = 100 / selectedItems.length;
     console.log("Approval Started");
-    selectedItems.forEach(async(element) => {
-      await approveSubmit(element);
-      progress+=eachProgress;
+    await Promise.all(selectedItems.map(async(ele)=>{
+      await approveSubmit(ele);
+      progress += eachProgress;
       setProgressState(progress);
-    });
-    //Empty selectedItems and redirect to Dates page
+    }));
+    setProgressState(0);
+    
   }
 
   const rejectSelected = () => {
@@ -65,7 +66,7 @@ function Approval() {
     //Empty selectedItems and redirect to Dates page
   }
 
-  const cbClick = (event , itemValue) => {
+  const cbClick = (event, itemValue) => {
     if (event.target.checked) {
       setSelectedItems([ ...selectedItems, itemValue ]);
     } else {
@@ -74,29 +75,30 @@ function Approval() {
       });
       setSelectedItems(newData1);
     }
+
   }
 
-  const showCb=(value) =>{
-    if(value["status"]==="Pending"){
+  const showCb = (value) => {
+    if (value[ "status" ] === "Pending") {
       return (
         <input type="checkbox" onChange={(event) => {
-          cbClick(event,value)
+          cbClick(event, value)
         }}></input>
       )
-    }else if(value["status"]==="Approved"){
+    } else if (value[ "status" ] === "Approved") {
       return (
-        <h5 style={{paddingRight:"16px", fontWeight:"400"}}>Approved</h5>
+        <h5 style={{ paddingRight: "16px", fontWeight: "400" }}>Approved</h5>
       )
-    }else if(value["status"]==="Rejected"){
+    } else if (value[ "status" ] === "Rejected") {
       return (
-        <h5 style={{paddingRight:"16px", fontWeight:"400"}}>Rejected</h5>
+        <h5 style={{ paddingRight: "16px", fontWeight: "400" }}>Rejected</h5>
       )
     }
   }
 
-  const removeFromSelectedItems = (itemValue)=>{
+  const removeFromSelectedItems = (itemValue) => {
     // console.log("clicked")
-    if(selectedItems.includes(itemValue)){
+    if (selectedItems.includes(itemValue)) {
       let newData2 = selectedItems.filter((item) => {
         return item !== itemValue
       });
@@ -114,99 +116,108 @@ function Approval() {
     user: "rishuparashar7@gmail.com"
   };
 
+
   return (
-    <div className="container">
-      <div className="div1">
-        <div className="top-left">
-          <h1 className="heading">Approvals</h1>
-          <span>{campName}</span>
-          <div className="search-div">
-            <input type="text" value={searched} onChange={(e)=>{
-              setSearched(e.target.value)
-            }} placeholder="search by email-id" />
-            <img src={require('./undo.png')} style={{width:"25px", height:"20px", marginLeft:"12px"}} />
-          </div>
-        </div>
-        <div className="top-right">
-          <button className="btn" >Download CSV</button>
-          <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
-          <button className="btn" onClick={approveSelected}>Aprrove selected</button>
-          <button className="delete-btn">Delete previous</button>
-        </div>
-      </div>
-    
-      <div style={{display : 'flex' , justifyContent : 'space-between'}}>
-        <div className="div2">
-          <nav>
-            <h1 style={{ color: 'white' }}>Records</h1>
-            <ul>
-              {
-                searched == "" ? (
-                  dataToShow.map((value, key) => {
-                    return (
-                      <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
-                        <ul style={{ width: "80%" }}>
-                          <li>{value.user}</li>
-                          <li>{value.dateTime}</li>
-                          <li style={{fontWeight:"bold", color:"#EEEEEE"}}>View Screenshot</li>
-                        </ul>
-                        <ul>
-                          {showCb(value)}
-                        </ul>
-                      </div>
-                    )
-                  })
-                ):(
-                  dataToShow.map((value, key) => {
-                    if(value.user.includes(searched)){
-                      return (
-                        <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
-                          <ul style={{ width: "80%" }}>
-                            <li>{value.user}</li>
-                            <li>{value.dateTime}</li>
-                            <li style={{fontWeight:"bold", color:"#EEEEEE"}}>View Screenshot</li>
-                          </ul>
-                          <ul>
-                            {showCb(value)}
-                          </ul>
-                        </div>
-                      )
-                    }
-                  })
-                )
-              }
-            </ul>
-          </nav>
-        </div>
-        <div className="div3">
-          {
-            selectedItems.length > 0 ?
-              (
+    <>
+      {
+        progressState !== 0 ? (
+          <div className="container">
+            <div className="div1">
+              <div className="top-left">
+                <h1 className="heading">Approvals</h1>
+                <span>{campName}</span>
+                <div className="search-div">
+                  <input type="text" value={searched} onChange={(e) => {
+                    setSearched(e.target.value)
+                  }} placeholder="search by email-id" />
+                  <img src={require('./undo.png')} style={{ width: "25px", height: "20px", marginLeft: "12px" }} />
+                </div>
+              </div>
+              <div className="top-right">
+                <button className="btn" >Download CSV</button>
+                <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
+                <button className="btn" onClick={approveSelected}>Aprrove selected</button>
+                <button className="delete-btn">Delete previous</button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div className="div2">
                 <nav>
-                  <h1 style={{ color: "white" }}>Selected People</h1>
+                  <h1 style={{ color: 'white' }}>Records</h1>
                   <ul>
                     {
-                      selectedItems.map((value, key) => {
-                        return (
-                          <div key={key} style={{ marginBottom: "20px", color: "white", display:"flex"}}>
-                            <ul style={{ width: "80%" }}>
-                              <li>{value.user}</li>
-                              <li>{value.dateTime}</li>
-                            </ul>
-                            <ul>
-                              <li onClick={removeFromSelectedItems(value)}><img src={require('./delete.png')} style={{width:"30px", height:"30px"}}/></li>
-                            </ul>
-                          </div>
-                        )
-                      })
+                      searched == "" ? (
+                        dataToShow.map((value, key) => {
+                          return (
+                            <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
+                              <ul style={{ width: "80%" }}>
+                                <li>{value.user}</li>
+                                <li>{value.dateTime}</li>
+                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }}>View Screenshot</li>
+                              </ul>
+                              <ul>
+                                {showCb(value)}
+                              </ul>
+                            </div>
+                          )
+                        })
+                      ) : (
+                        dataToShow.map((value, key) => {
+                          if (value.user.includes(searched)) {
+                            return (
+                              <div key={key} style={{ marginBottom: "20px", color: 'white', display: 'flex' }}>
+                                <ul style={{ width: "80%" }}>
+                                  <li>{value.user}</li>
+                                  <li>{value.dateTime}</li>
+                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }}>View Screenshot</li>
+                                </ul>
+                                <ul>
+                                  {showCb(value)}
+                                </ul>
+                              </div>
+                            )
+                          }
+                        })
+                      )
                     }
                   </ul>
                 </nav>
-              ) : <></>
-          }
-        </div>
-      </div>
-    </div>
+              </div>
+              <div className="div3">
+                {
+                  selectedItems.length > 0 ?
+                    (
+                      <nav>
+                        <h1 style={{ color: "white" }}>Selected People</h1>
+                        <ul>
+                          {
+                            selectedItems.map((value, key) => {
+                              return (
+                                <div key={key} style={{ marginBottom: "20px", color: "white", display: "flex" }}>
+                                  <ul style={{ width: "80%" }}>
+                                    <li>{value.user}</li>
+                                    <li>{value.dateTime}</li>
+                                  </ul>
+                                  <ul>
+                                    <li onClick={removeFromSelectedItems(value)}><img src={require('./delete.png')} style={{ width: "30px", height: "30px" }} /></li>
+                                  </ul>
+                                </div>
+                              )
+                            })
+                          }
+                        </ul>
+                      </nav>
+                    ) : <></>
+                }
+              </div>
+            </div>
+          </div>
+        ):(
+          <h1>{progressState}</h1>
+        )
+      }
+    </>
   )
 }
 
