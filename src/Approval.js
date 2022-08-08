@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import "./style.css";
 import {
-  approveSubmit,
   rejectSubmit,
-  deletePrevious
+  deletePrevious,
+  approveSubmittedApproval
 } from "./FirestoreFun"
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 
 function Approval() {
 
@@ -18,7 +18,8 @@ function Approval() {
   let dataToShow = [];
   const [ searched, setSearched ] = useState("");
   const [ selectedItems, setSelectedItems ] = useState([]);
-  const [ progressState, setProgressState ] = useState(0);
+  const [ loading, setLoading] = useState(0);
+  let navigate = useNavigate();
 
 
   approvalData.forEach(approval => {
@@ -35,35 +36,31 @@ function Approval() {
     dataToShow.push(element)
   });
 
-  const approveSelected = async () => {
-    let progress = 0;
-    let eachProgress = 100 / selectedItems.length;
-    console.log("Approval Started");
-    await Promise.all(selectedItems.map(async (ele) => {
-      await approveSubmit(ele);
-      progress += eachProgress;
-      setProgressState(progress);
-    }));
-    setProgressState(0);
-
+  const approveSelected =async() => {
+    setLoading(1);
+    let items = selectedItems;
+    await approveSubmittedApproval(items);
+    setLoading(0)
+    navigate("../approvaldate", {replace:true})
   }
 
-  const rejectSelected = () => {
-    console.log("Rejection Started")
-    selectedItems.forEach(element => {
-      rejectSubmit(element);
-    });
-    //Empty selectedItems and redirect to Dates page
+  const rejectSelected = async() => {
+    setLoading(1);
+    let items = selectedItems;
+    await rejectSubmit(items);
+    setLoading(0);
+    navigate("../approvaldate", {replace:true})
   }
 
   const downloadCSV = () => {
   }
 
-  const deletePrevious = () => {
-    approvalDone.forEach(element => {
-      deletePrevious(element);
-    });
-    //Empty selectedItems and redirect to Dates page
+  const deletePreviousApprovals = async() => {
+    setLoading(1);
+    let items = approvalDone;
+    await deletePrevious(items);
+    setLoading(0);
+    navigate("../approvaldate", {replace:true})
   }
 
   const cbClick = (event, itemValue) => {
@@ -75,7 +72,6 @@ function Approval() {
       });
       setSelectedItems(newData1);
     }
-
   }
 
   const showCb = (value) => {
@@ -97,12 +93,11 @@ function Approval() {
   }
 
   const removeFromSelectedItems = (itemValue) => {
-    // console.log("clicked")
     if (selectedItems.includes(itemValue)) {
       let newData2 = selectedItems.filter((item) => {
         return item !== itemValue
       });
-      // setSelectedItems(newData2);
+      //setSelectedItems(newData2);
     }
   }
 
@@ -120,7 +115,7 @@ function Approval() {
   return (
     <>
       {
-        progressState === 0 ? (
+        loading === 0 ? (
           <div className="container">
             <div className="div1">
               <div className="top-left">
@@ -134,10 +129,10 @@ function Approval() {
                 </div>
               </div>
               <div className="top-right">
-                <button className="btn" >Download CSV</button>
+                <button className="btn" onClick={downloadCSV} >Download CSV</button>
                 <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
                 <button className="btn" onClick={approveSelected}>Aprrove selected</button>
-                <button className="delete-btn">Delete previous</button>
+                <button className="delete-btn" onClick={deletePreviousApprovals}>Delete previous</button>
               </div>
             </div>
 
@@ -220,7 +215,7 @@ function Approval() {
             </div>
           </div>
           <div>
-            <h1>{progressState}</h1>
+            <h1>Loading...</h1>
           </div>
           </div>
         )
@@ -229,7 +224,6 @@ function Approval() {
   )
 }
 
-// Loading % bar
-// refresh data once rejected or approved,
+//Delete button in selectedItems
 
 export default Approval
