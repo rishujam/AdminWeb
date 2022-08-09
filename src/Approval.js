@@ -5,7 +5,7 @@ import {
   deletePrevious,
   approveSubmittedApproval
 } from "./FirestoreFun"
-import { useNavigate, Link, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Approval() {
 
