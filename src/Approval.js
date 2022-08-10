@@ -6,6 +6,9 @@ import {
   approveSubmittedApproval
 } from "./FirestoreFun"
 import { useNavigate, useLocation } from 'react-router-dom';
+import { CSVLink } from "react-csv";
+
+
 
 function Approval(){
 
@@ -80,7 +83,16 @@ const dialogCloseButtonStyles = {
     navigate("../approvaldate", {replace:true})
   }
 
-  const downloadCSV = () => {
+  const headers = [
+    {label:"User", key:"user"},
+    {label:"Campaign", key:"campRewardName"},
+    {label: "Date and Time", key:"dateTime"}
+  ];
+  
+  const csvReport = {
+    filename: 'Report.csv',
+    headers:headers,
+    data:dataToShow
   }
 
   const deletePreviousApprovals = async() => {
@@ -125,7 +137,7 @@ const dialogCloseButtonStyles = {
       let newData2 = selectedItems.filter((item) => {
         return item !== itemValue
       });
-      //setSelectedItems(newData2);
+      setSelectedItems(newData2);
     }
   }
 
@@ -155,7 +167,7 @@ const dialogCloseButtonStyles = {
                 </div>
               </div>
               <div className="top-right">
-                <button className="btn" onClick={downloadCSV} >Download CSV</button>
+                <CSVLink {...csvReport}>Download CSV</CSVLink>
                 <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
                 <button className="btn" onClick={approveSelected}>Aprrove selected</button>
                 <button className="delete-btn" onClick={deletePreviousApprovals}>Delete previous</button>
@@ -263,8 +275,8 @@ const dialogCloseButtonStyles = {
 }
 
 //Delete button in selectedItems
-//View Screenshot
 //Hide keys in env file 
 //Host on Firebase
+//Do not repeat items in selectedItems
 
 export default Approval
