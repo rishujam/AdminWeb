@@ -99,7 +99,7 @@ const approveSubmittedApproval = async(selectedSubmits) =>{
 
             if(fatherUser!==undefined){
                 // Update Father Wallet
-                const docRef6 = doc(db, "wallet", user);
+                const docRef6 = doc(db, "wallet", fatherUser);
                 let document4 = await getDoc(docRef6);
                 let currentAmount1 = 0;
                 if(document4.exists()){
@@ -117,19 +117,19 @@ const approveSubmittedApproval = async(selectedSubmits) =>{
                 const docRef7 = doc(db, "refer", "userEarnings")
                 let document5 = await getDoc(docRef7);
                 let oldAmount = 0
-                if(document5.data()[user]!==undefined){
-                    oldAmount = Number(document5.data()[user]);
+                if(document5.data()[fatherUser]!==undefined){
+                    oldAmount = Number(document5.data()[fatherUser]);
                 }
                 let newAmount3 = oldAmount+refAmount;
                 let dataToSet = {};
-                dataToSet[user] = ""+newAmount3
+                dataToSet[fatherUser] = ""+newAmount3
                 await setDoc(docRef7, dataToSet,{merge:true})
                 console.log("addToReferAmountDone")
 
                 //get father token
 
                 let fatherToken = ""
-                const docRef = doc(db, "utils",`token${user}`);
+                const docRef = doc(db, "utils",`token${fatherUser}`);
                 let document = await getDoc(docRef);
                 if(document.exists()){
                     token = document.data()["token"];
@@ -225,6 +225,13 @@ const deletePrevious = async(selectedItems)=>{
     }
     console.log("Deletion completed");
 }
+
+const getUrl = async() =>{
+    const ref = storage.child("postermusic.jpg");
+    const url = await ref.getDownloadUrl();
+    return url;
+}
+
 
 export {
     rejectSubmit,

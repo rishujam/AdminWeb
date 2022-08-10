@@ -35,18 +35,18 @@ function DateApprovals() {
     }, [ 1 ]);
 
     const docData = {
-        "25,4": {
+        "25,2": {
             campId:"25",
             campRewardName:"Instaclean,10",
-            dateTime:"27/04/22, 07:05:10",
+            dateTime:"27/04/22, 11:15:10",
             formData: ["name,Sudhanshu", "class,10"],
             status: "Pending",
-            subCount: "4",
-            user: "rishuparashar7@gmail.com"
+            subCount: "2",
+            user: "androguide@gmail.com"
         }
     };
     const sendData = async() =>{
-        await setDoc(doc(db, "promoCampPerformed", docData["25,4"]["user"]), docData, {merge:true});
+        await setDoc(doc(db, "promoCampPerformed", docData["25,2"]["user"]), docData, {merge:true});
     }
 
     const filterAndPassData = (date) => {

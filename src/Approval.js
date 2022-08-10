@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Component, useState } from 'react';
 import "./style.css";
 import {
   rejectSubmit,
@@ -7,7 +7,34 @@ import {
 } from "./FirestoreFun"
 import { useNavigate, useLocation } from 'react-router-dom';
 
-function Approval() {
+function Approval(){
+
+  const dialogStyles ={
+    width:"400px",
+    maxWidth: "400px",
+    margin:"0 auto",
+    position: "fixed",
+    left:"30%",
+    top: "60px",
+    transform: "translate(-50,-50)",
+    zIndex: "999",
+    backgroundColor:"#eee",
+    pading: "10px 20px 40px",
+    borderRadius: "8px",
+    flexDirection :"column"
+};
+
+const dialogCloseButtonStyles = {
+    marginBottom: "15px",
+    padding: "3px 8px",
+    cursor: "pointer",
+    borderRadius: "50%",
+    border: "none",
+    width: "30px",
+    height: "30px",
+    fontWeight: "bold",
+    alignSelf: "flex-end"
+};
 
   const loc = useLocation();
   const date = loc.state.date;
@@ -20,6 +47,7 @@ function Approval() {
   const [ selectedItems, setSelectedItems ] = useState([]);
   const [ loading, setLoading] = useState(0);
   let navigate = useNavigate();
+  const [dialogState, setDialogState] = useState(false);
 
 
   approvalData.forEach(approval => {
@@ -101,16 +129,14 @@ function Approval() {
     }
   }
 
-  const campSubmit = {
-    campId: "25",
-    campRewardName: "Instaclean,10",
-    dateTime: "27/04/22, 05:05:10",
-    formData: [ "name,Sudhanshu", "class,10" ],
-    status: "Approved",
-    subCount: "1",
-    user: "rishuparashar7@gmail.com"
-  };
+  const dialogOpen = () =>{
+    setDialogState(true)
+  }
 
+  const dialogClose = () =>{
+    setDialogState(false)
+  }
+  
 
   return (
     <>
@@ -149,7 +175,7 @@ function Approval() {
                               <ul style={{ width: "80%" }}>
                                 <li>{value.user}</li>
                                 <li>{value.dateTime}</li>
-                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }}>View Screenshot</li>
+                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen}>View Screenshot</li>
                               </ul>
                               <ul>
                                 {showCb(value)}
@@ -165,7 +191,7 @@ function Approval() {
                                 <ul style={{ width: "80%" }}>
                                   <li>{value.user}</li>
                                   <li>{value.dateTime}</li>
-                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }}>View Screenshot</li>
+                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen} >View Screenshot</li>
                                 </ul>
                                 <ul>
                                   {showCb(value)}
@@ -207,7 +233,19 @@ function Approval() {
                 }
               </div>
             </div>
+            <div>
+            {
+              dialogState ? (
+                <div style ={dialogStyles}>
+                  <button style ={dialogCloseButtonStyles} onClick = {dialogClose}>x</button>
+                  <img  style= {{height:"600px"}} src="https://firebasestorage.googleapis.com/v0/b/taskox-c1d7e.appspot.com/o/proofCampPromo%2Fajaybhatti127040%40gmail.com%2C21%2C1?alt=media&token=1769de4e-01fa-4153-add8-4a3750beaca2"/>
+                </div>
+              ):<></>
+            }
+            </div>
           </div>
+          
+          
         ) : (
           <div style={{display:"flex" , alignItems:"center" , justifyContent : "center"}}>
           <div className="loadingio-spinner-spinner-d5vda8qm7j5"><div className="ldio-9u8gbddmqad">
@@ -225,5 +263,8 @@ function Approval() {
 }
 
 //Delete button in selectedItems
+//View Screenshot
+//Hide keys in env file 
+//Host on Firebase
 
 export default Approval
