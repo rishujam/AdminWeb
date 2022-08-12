@@ -3,7 +3,8 @@ import "./style.css";
 import {
   rejectSubmit,
   deletePrevious,
-  approveSubmittedApproval
+  approveSubmittedApproval,
+  getUrl
 } from "./FirestoreFun"
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CSVLink } from "react-csv";
@@ -51,6 +52,7 @@ const dialogCloseButtonStyles = {
   const [ loading, setLoading] = useState(0);
   let navigate = useNavigate();
   const [dialogState, setDialogState] = useState(false);
+  const [dialogUrl, setDialogUrl ] = useState("");
 
 
   approvalData.forEach(approval => {
@@ -105,7 +107,9 @@ const dialogCloseButtonStyles = {
 
   const cbClick = (event, itemValue) => {
     if (event.target.checked) {
-      setSelectedItems([ ...selectedItems, itemValue ]);
+      if(!selectedItems.includes(itemValue)){
+        setSelectedItems([ ...selectedItems, itemValue ]);
+      }
     } else {
       let newData1 = selectedItems.filter((item) => {
         return item !== itemValue
@@ -132,21 +136,17 @@ const dialogCloseButtonStyles = {
     }
   }
 
-  const removeFromSelectedItems = (itemValue) => {
-    if (selectedItems.includes(itemValue)) {
-      let newData2 = selectedItems.filter((item) => {
-        return item !== itemValue
-      });
-      setSelectedItems(newData2);
+  const dialogOpen = async(user, campId, subCount) =>{
+    let url = await getUrl(user,campId,subCount);
+    if(url!==""){
+      setDialogUrl(url);
+      setDialogState(!dialogState);
     }
   }
 
-  const dialogOpen = () =>{
-    setDialogState(true)
-  }
-
   const dialogClose = () =>{
-    setDialogState(false)
+    setDialogUrl("");
+    setDialogState(false);
   }
   
 
@@ -160,10 +160,9 @@ const dialogCloseButtonStyles = {
                 <h1 className="heading">Approvals</h1>
                 <span>{campName}</span>
                 <div className="search-div">
-                  <input type="text" value={searched} onChange={(e) => {
+                  <input style = {{width:"300px"}}type="text" value={searched} onChange={(e) => {
                     setSearched(e.target.value)
-                  }} placeholder="search by email-id" />
-                  <img src={require('./undo.png')} style={{ width: "25px", height: "20px", marginLeft: "12px" }} />
+                  }} placeholder="Search user" />
                 </div>
               </div>
               <div className="top-right">
@@ -187,7 +186,7 @@ const dialogCloseButtonStyles = {
                               <ul style={{ width: "80%" }}>
                                 <li>{value.user}</li>
                                 <li>{value.dateTime}</li>
-                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen}>View Screenshot</li>
+                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen(value.user, value.campId,value.subCount)}>View Screenshot</li>
                               </ul>
                               <ul>
                                 {showCb(value)}
@@ -203,7 +202,7 @@ const dialogCloseButtonStyles = {
                                 <ul style={{ width: "80%" }}>
                                   <li>{value.user}</li>
                                   <li>{value.dateTime}</li>
-                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen} >View Screenshot</li>
+                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen(value.user, value.campId,value.subCount)} >View Screenshot</li>
                                 </ul>
                                 <ul>
                                   {showCb(value)}
@@ -233,7 +232,7 @@ const dialogCloseButtonStyles = {
                                     <li>{value.dateTime}</li>
                                   </ul>
                                   <ul>
-                                    <li onClick={removeFromSelectedItems(value)}><img src={require('./delete.png')} style={{ width: "30px", height: "30px" }} /></li>
+                                    {/* Delete Button */}
                                   </ul>
                                 </div>
                               )
@@ -247,10 +246,10 @@ const dialogCloseButtonStyles = {
             </div>
             <div>
             {
-              dialogState ? (
+              dialogState === true ? (
                 <div style ={dialogStyles}>
                   <button style ={dialogCloseButtonStyles} onClick = {dialogClose}>x</button>
-                  <img  style= {{height:"600px"}} src="https://firebasestorage.googleapis.com/v0/b/taskox-c1d7e.appspot.com/o/proofCampPromo%2Fajaybhatti127040%40gmail.com%2C21%2C1?alt=media&token=1769de4e-01fa-4153-add8-4a3750beaca2"/>
+                  <img  style= {{height:"600px"}} src={dialogUrl}/>
                 </div>
               ):<></>
             }
@@ -274,9 +273,7 @@ const dialogCloseButtonStyles = {
   )
 }
 
-//Delete button in selectedItems
 //Hide keys in env file 
 //Host on Firebase
-//Do not repeat items in selectedItems
 
 export default Approval

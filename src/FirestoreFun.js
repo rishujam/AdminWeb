@@ -1,6 +1,6 @@
 import { db, messaging } from "./firebase-config"
 import { collection, doc, setDoc, getDocs, query, getDoc, updateDoc } from "firebase/firestore";
-import { getStorage, ref, deleteObject} from "firebase/storage";
+import { getStorage, ref, deleteObject, getDownloadURL} from "firebase/storage";
 import { async } from "@firebase/util";
 
 const storage = getStorage();
@@ -226,15 +226,19 @@ const deletePrevious = async(selectedItems)=>{
     console.log("Deletion completed");
 }
 
-const getUrl = async() =>{
-    const ref = storage.child("postermusic.jpg");
-    const url = await ref.getDownloadUrl();
-    return url;
+const getUrl = async(user, campId, subCount) =>{
+    try{
+        const url = await getDownloadURL(ref(storage,`proofCampPromo/${user},${campId},${subCount}.png`));
+        return url;
+    }catch{
+        return ""
+    }
 }
 
 
 export {
     rejectSubmit,
     deletePrevious,
-    approveSubmittedApproval
+    approveSubmittedApproval,
+    getUrl
 }
