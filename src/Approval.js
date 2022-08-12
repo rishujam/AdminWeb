@@ -51,8 +51,8 @@ const dialogCloseButtonStyles = {
   const [ selectedItems, setSelectedItems ] = useState([]);
   const [ loading, setLoading] = useState(0);
   let navigate = useNavigate();
+  const [dialogUrl, setDialogUrl] = useState("");
   const [dialogState, setDialogState] = useState(false);
-  const [dialogUrl, setDialogUrl ] = useState("");
 
 
   approvalData.forEach(approval => {
@@ -136,17 +136,18 @@ const dialogCloseButtonStyles = {
     }
   }
 
-  const dialogOpen = async(user, campId, subCount) =>{
+  const dialogOpen =(user, campId, subCount)=> async() =>{
+    console.log("dialogOpen");
     let url = await getUrl(user,campId,subCount);
     if(url!==""){
-      setDialogUrl(url);
       setDialogState(!dialogState);
+      setDialogUrl(url)
     }
   }
 
   const dialogClose = () =>{
-    setDialogUrl("");
-    setDialogState(false);
+    console.log("Dialog close");
+    setDialogState(!dialogState);
   }
   
 
@@ -186,7 +187,7 @@ const dialogCloseButtonStyles = {
                               <ul style={{ width: "80%" }}>
                                 <li>{value.user}</li>
                                 <li>{value.dateTime}</li>
-                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen(value.user, value.campId,value.subCount)}>View Screenshot</li>
+                                <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen(value.user,value.campId, value.subCount)}>View Screenshot</li>
                               </ul>
                               <ul>
                                 {showCb(value)}
@@ -202,7 +203,7 @@ const dialogCloseButtonStyles = {
                                 <ul style={{ width: "80%" }}>
                                   <li>{value.user}</li>
                                   <li>{value.dateTime}</li>
-                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen(value.user, value.campId,value.subCount)} >View Screenshot</li>
+                                  <li style={{ fontWeight: "bold", color: "#EEEEEE" }} onClick = {dialogOpen(value.user,value.campId, value.subCount)} >View Screenshot</li>
                                 </ul>
                                 <ul>
                                   {showCb(value)}

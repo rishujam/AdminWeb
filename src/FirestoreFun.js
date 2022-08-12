@@ -194,33 +194,35 @@ const rejectSubmit = async(selectedItems) =>{
                 await updateDoc(docRef2, {Total: newAmount1});
             }
             console.log("updatePendingDone")
-
-            count++;
-            console.log(`Rejection ${count} Done`);
         }catch(error){}
+        count++;
+        console.log(`Rejection ${count}`);
     }
 }
 
 const deletePrevious = async(selectedItems)=>{
     let count = 0;
     for(const campSubmit of selectedItems){
+        try{
+            // Update sumbission status
 
-        //Delete File
+            let currStatus = campSubmit["status"];
+            campSubmit["status"] = `Deleted,${currStatus}`;
+            const docRef = doc(db, "promoCampPerformed", campSubmit["user"]);
+            var obj = {};
+            const key = `${campSubmit["campId"]},${campSubmit["subCount"]}`;
+            obj[key] = campSubmit;
+            await updateDoc(docRef, obj);
+            console.log("UpdateSubmitDone")
 
-        const fileName = ref(storage, `proofCampPromo/${campSubmit["user"]},${campSubmit["campId"]},${campSubmit["subCount"]}`);
-        await deleteObject(fileName);
-        console.log("Deleted Image")
+            //Delete File
 
-        // Update sumbission status
+            const fileName = ref(storage, `proofCampPromo/${campSubmit["user"]},${campSubmit["campId"]},${campSubmit["subCount"]}`);
+            await deleteObject(fileName);
+            console.log("Deleted Image")
 
-        let currStatus = campSubmit["status"];
-        campSubmit["status"] = `Deleted,${currStatus}`;
-        const docRef = doc(db, "promoCampPerformed", campSubmit["user"]);
-        var obj = {};
-        const key = `${campSubmit["campId"]},${campSubmit["subCount"]}`;
-        obj[key] = campSubmit;
-        await updateDoc(docRef, obj);
-        console.log("UpdateSubmitDone")
+        }catch(error){}
+        count++;
         console.log(`Deleted ${count}`);
     }
     console.log("Deletion completed");
@@ -228,7 +230,7 @@ const deletePrevious = async(selectedItems)=>{
 
 const getUrl = async(user, campId, subCount) =>{
     try{
-        const url = await getDownloadURL(ref(storage,`proofCampPromo/${user},${campId},${subCount}.png`));
+        const url = await getDownloadURL(ref(storage,`proofCampPromo/${user},${campId},${subCount}`));
         return url;
     }catch{
         return ""
