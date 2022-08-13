@@ -1,7 +1,6 @@
 import { auth } from "./firebase-config";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-require('dotenv').config()
 
 function Home() {
 
