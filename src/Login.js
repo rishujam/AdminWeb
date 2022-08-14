@@ -7,7 +7,6 @@ function Login(){
 
     let navigate = useNavigate();
 
-    const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
     const [currentUser, setCurrentUser] = useState(null);
     
@@ -26,10 +25,9 @@ function Login(){
     try{
       const user = await signInWithEmailAndPassword(
         auth,
-        loginEmail,
+        process.env.REACT_APP_ADMIN_EMAIL,
         loginPassword
       );
-
       console.log(user);
     }catch(error) {
       console.log(error.message);
@@ -38,12 +36,6 @@ function Login(){
   return (
     <div className="App">
       <h2> Login </h2>
-      <input 
-        type="text"
-        onChange={(e) =>setLoginEmail(e.target.value)}
-        value={loginEmail}
-        placeholder="Email..."
-        required/>
       <input 
         type="text"
         onChange={(event) => setLoginPassword(event.target.value)}
