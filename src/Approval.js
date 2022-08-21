@@ -53,7 +53,7 @@ const dialogCloseButtonStyles = {
   let navigate = useNavigate();
   const [dialogUrl, setDialogUrl] = useState("");
   const [dialogState, setDialogState] = useState(false);
-
+  const [ selectAllState, setSelectAllState ] = useState(false);
 
   approvalData.forEach(approval => {
     if (approval[ "status" ] === "Pending") {
@@ -149,6 +149,16 @@ const dialogCloseButtonStyles = {
     console.log("Dialog close");
     setDialogState(!dialogState);
   }
+
+  const selectAll =(event) =>{
+    if(event.target.checked){
+      setSelectAllState(true);
+      setSelectedItems(approvalPending);
+    }else{
+      setSelectAllState(false);
+      setSelectedItems([]);
+    }
+  }
   
 
   return (
@@ -164,6 +174,7 @@ const dialogCloseButtonStyles = {
                   <input style = {{width:"300px"}}type="text" value={searched} onChange={(e) => {
                     setSearched(e.target.value)
                   }} placeholder="Search user" />
+                  <label style={{marginLeft:"30px", fontWeight:"bold"}}> Select All <input type="checkbox" onChange={(event)=>{selectAll(event)}}/></label>
                 </div>
               </div>
               <div className="top-right">

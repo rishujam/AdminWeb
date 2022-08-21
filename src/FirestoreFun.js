@@ -73,7 +73,7 @@ const approveSubmittedApproval = async(selectedSubmits) =>{
                     method: 'POST',
                     headers: {
                         'Content-Type':'application/json',
-                        'Authorization': 'key=AAAA6u5VV9I:APA91bGjcEPeuJIvXkjHucizJ5CZaHyLGpmEkL-WlJaEWqfE9OHRvK-aUXjGMhHnONdepR0KCHPPuugCP9ZepbEFedr9aNN6MSECgXtJw3G3DvNo-2UII9rACfxCqF_eCkgDK-ItrVla'
+                        'Authorization': `key=${process.env.REACT_APP_SERVER_KEY_MESSAGING}`
                     },
                     body:JSON.stringify({
                         "data" : {
