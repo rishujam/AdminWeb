@@ -47,8 +47,6 @@ const approveSubmittedApproval = async(selectedSubmits) =>{
                 if(pendAmount===undefined){
                     pendAmount = 0;
                 }
-            }else{
-                pendAmount = 0;
             }
             let newAmount1 = pendAmount-amount;
             if(newAmount1>=0){
@@ -109,7 +107,7 @@ const approveSubmittedApproval = async(selectedSubmits) =>{
                     }
                 }
                 let newAmount2 = currentAmount1+refAmount;
-                await setDoc(doc(db, "wallet", user), {Total:newAmount2}); 
+                await setDoc(doc(db, "wallet", fatherUser), {Total:newAmount2}); 
                 console.log("updateFatherWalletDone");
 
                 // Update to referal Earning document
