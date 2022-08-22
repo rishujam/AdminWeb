@@ -86,70 +86,72 @@ const approveSubmittedApproval = async(selectedSubmits) =>{
 
             // get Father
 
-            const refAmount = amount/10;
-            const docRef5 = doc(db,"refer", "child-parent");
-            let fatherUser = undefined;
-            let document3 = await getDoc(docRef5);
-            if(document3.exists()){
-                fatherUser = document3.data()[user];
-            }
-            console.log("getFatherDone")
+            const refAmount = Math.floor(amount/10);
+            if(refAmount>0){
+                const docRef5 = doc(db,"refer", "child-parent");
+                let fatherUser = undefined;
+                let document3 = await getDoc(docRef5);
+                if(document3.exists()){
+                    fatherUser = document3.data()[user];
+                }
+                console.log("getFatherDone")
 
-            if(fatherUser!==undefined){
-                // Update Father Wallet
-                const docRef6 = doc(db, "wallet", fatherUser);
-                let document4 = await getDoc(docRef6);
-                let currentAmount1 = 0;
-                if(document4.exists()){
-                    currentAmount1 = document4.data()["Total"];
-                    if(currentAmount1===undefined){
-                        currentAmount1= 0;
+                if(fatherUser!==undefined){
+                    // Update Father Wallet
+                    const docRef6 = doc(db, "wallet", fatherUser);
+                    let document4 = await getDoc(docRef6);
+                    let currentAmount1 = 0;
+                    if(document4.exists()){
+                        currentAmount1 = document4.data()["Total"];
+                        if(currentAmount1===undefined){
+                            currentAmount1= 0;
+                        }
                     }
-                }
-                let newAmount2 = currentAmount1+refAmount;
-                await setDoc(doc(db, "wallet", fatherUser), {Total:newAmount2}); 
-                console.log("updateFatherWalletDone");
+                    let newAmount2 = currentAmount1+refAmount;
+                    await setDoc(doc(db, "wallet", fatherUser), {Total:newAmount2}); 
+                    console.log("updateFatherWalletDone");
 
-                // Update to referal Earning document
+                    // Update to referal Earning document
 
-                const docRef7 = doc(db, "refer", "userEarnings")
-                let document5 = await getDoc(docRef7);
-                let oldAmount = 0
-                if(document5.data()[fatherUser]!==undefined){
-                    oldAmount = Number(document5.data()[fatherUser]);
-                }
-                let newAmount3 = oldAmount+refAmount;
-                let dataToSet = {};
-                dataToSet[fatherUser] = ""+newAmount3
-                await setDoc(docRef7, dataToSet,{merge:true})
-                console.log("addToReferAmountDone")
+                    const docRef7 = doc(db, "refer", "userEarnings")
+                    let document5 = await getDoc(docRef7);
+                    let oldAmount = 0
+                    if(document5.data()[fatherUser]!==undefined){
+                        oldAmount = Number(document5.data()[fatherUser]);
+                    }
+                    let newAmount3 = oldAmount+refAmount;
+                    let dataToSet = {};
+                    dataToSet[fatherUser] = ""+newAmount3
+                    await setDoc(docRef7, dataToSet,{merge:true})
+                    console.log("addToReferAmountDone")
 
-                //get father token
+                    //get father token
 
-                let fatherToken = ""
-                const docRef = doc(db, "utils",`token${fatherUser}`);
-                let document = await getDoc(docRef);
-                if(document.exists()){
-                    token = document.data()["token"];
-                }
-                console.log("getTokenDone")
+                    let fatherToken = ""
+                    const docRef = doc(db, "utils",`token${fatherUser}`);
+                    let document = await getDoc(docRef);
+                    if(document.exists()){
+                        token = document.data()["token"];
+                    }
+                    console.log("getTokenDone")
 
-                if(fatherToken!==undefined || fatherToken!==""){
-                    let message1 = `₹${refAmount} Added to Wallet as referral earnings`;
-                    const requestOptions1 = {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type':'application/json',
-                            'Authorization': `key=${process.env.REACT_APP_SERVER_KEY_MESSAGING}`
-                        },
-                        body:JSON.stringify({
-                            "data" : {
-                                "message" : message1
+                    if(fatherToken!==undefined || fatherToken!==""){
+                        let message1 = `₹${refAmount} Added to Wallet as referral earnings`;
+                        const requestOptions1 = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':'application/json',
+                                'Authorization': `key=${process.env.REACT_APP_SERVER_KEY_MESSAGING}`
                             },
-                            "to" : fatherToken
-                        })
+                            body:JSON.stringify({
+                                "data" : {
+                                    "message" : message1
+                                },
+                                "to" : fatherToken
+                            })
+                        }
+                        await fetch('https://fcm.googleapis.com/fcm/send', requestOptions1);
                     }
-                    await fetch('https://fcm.googleapis.com/fcm/send', requestOptions1);
                 }
             }
         }catch(error){}
