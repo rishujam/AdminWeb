@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import "./style.css";
 import {
   rejectSubmit,
@@ -8,7 +8,9 @@ import {
 } from "./FirestoreFun"
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CSVLink } from "react-csv";
-
+import Papa from "papaparse";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
 function Approval(){
@@ -54,6 +56,7 @@ const dialogCloseButtonStyles = {
   const [dialogUrl, setDialogUrl] = useState("");
   const [dialogState, setDialogState] = useState(false);
   const [ selectAllState, setSelectAllState ] = useState(false);
+  let dateToSubMap ={};
 
   approvalData.forEach(approval => {
     if (approval[ "status" ] === "Pending") {
@@ -62,9 +65,13 @@ const dialogCloseButtonStyles = {
       approvalDone.push(approval);
     }
   });
+
   approvalPending.forEach(element => {
     dataToShow.push(element)
+    const key = `${element["dateTime"]}${element["user"]}`;
+    dateToSubMap[key] = element;
   });
+  
   approvalDone.forEach(element => {
     dataToShow.push(element)
   });
@@ -87,12 +94,13 @@ const dialogCloseButtonStyles = {
 
   const headers = [
     {label:"User", key:"user"},
-    {label:"Campaign", key:"campRewardName"},
-    {label: "Date and Time", key:"dateTime"}
+    {label:"Submissions count", key:"subCount"},
+    {label: "Date and Time", key:"dateTime"},
+    {label: "Update here", key:"status"}
   ];
   
   const csvReport = {
-    filename: 'Report.csv',
+    filename: `${campName}.csv`,
     headers:headers,
     data:dataToShow
   }
@@ -154,11 +162,83 @@ const dialogCloseButtonStyles = {
     if(event.target.checked){
       setSelectAllState(true);
       setSelectedItems(approvalPending);
+
     }else{
       setSelectAllState(false);
       setSelectedItems([]);
     }
   }
+
+  const selectFile=(e)=>{
+    Papa.parse(e.target.files[0], {
+      header: true,
+      skipEmptyLines: true,
+      complete: function (results) {
+        const rowsArray = [];
+        const valuesArray = [];
+
+        // Iterating data to get column name and their values
+        results.data.map((d) => {
+          rowsArray.push(Object.keys(d));
+          valuesArray.push(Object.values(d));
+        });
+        let toRejectTemp = [];
+        let toApproveTemp = [];
+        for(const sub of valuesArray){
+          if(sub[3]==="Rejected") toRejectTemp.push(sub);
+          if(sub[3]==="Approved") toApproveTemp.push(sub);
+        }
+        console.log(toApproveTemp);
+        console.log(toRejectTemp)
+        let toReject = [];
+        let toApprove = [];
+        let skipped = 0;
+        for(const sub of toApproveTemp){
+          const hash = `${sub[2]}${sub[0]}`
+          if(dateToSubMap[hash]!==undefined){
+            toApprove.push(dateToSubMap[hash]);
+          }else{
+            skipped++;
+          }
+        }
+        for(const sub of toRejectTemp){
+          const hash = `${sub[2]}${sub[0]}`
+          if(dateToSubMap[hash]!==undefined){
+            toReject.push(dateToSubMap[hash]);
+          }else{
+            skipped++;
+          }
+        }
+        const options = {
+          title: 'Confirmation',
+          message: `Items Approving: ${toApprove.length},  Items Rejecting: ${toReject.length}, Items Skipping: ${skipped}`,
+          buttons: [
+            {
+              label: 'Confirm',
+              onClick: () => continueTask(toApprove, toReject)
+            },
+            {
+              label: 'Cancel',
+              onClick: () => console.log("Cancelled")
+            }
+          ],
+          closeOnEscape: true,
+          closeOnClickOutside: false,
+          overlayClassName: "overlay-custom-class-name"
+        };
+        confirmAlert(options);
+      },
+    });
+  }
+
+  const continueTask=async(listToApprove, listToReject)=>{
+    setLoading(1);
+    await approveSubmittedApproval(listToApprove);
+    await rejectSubmit(listToReject);
+    setLoading(0);
+    navigate("../approvaldate", {replace:true});
+  }
+  
   
 
   return (
@@ -179,6 +259,7 @@ const dialogCloseButtonStyles = {
               </div>
               <div className="top-right">
                 <CSVLink {...csvReport}>Download CSV</CSVLink>
+                <input onChange={selectFile} id="csvInput" name="file" type="File" accept=".csv"/>
                 <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
                 <button className="btn" onClick={approveSelected}>Aprrove selected</button>
                 <button className="delete-btn" onClick={deletePreviousApprovals}>Delete previous</button>
