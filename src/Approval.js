@@ -102,7 +102,7 @@ const dialogCloseButtonStyles = {
   const csvReport = {
     filename: `${campName}.csv`,
     headers:headers,
-    data:dataToShow
+    data:approvalPending
   }
 
   const deletePreviousApprovals = async() => {
