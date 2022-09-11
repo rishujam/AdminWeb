@@ -15,6 +15,11 @@ function Home() {
     const navToApprovalsDate=  () =>{
         navigate('/approvaldate');
     }
+
+    const navToRedeemRequest = () =>{
+        navigate('/redeemreq');
+    }
+    
     return (
         <div>
             <header>
@@ -23,7 +28,7 @@ function Home() {
             <nav>
                <a onClick={navToApprovalsDate}>Manage Approvals</a>
                <a>Manage Campaign</a>
-               <a>Redeem Requests</a>
+               <a onClick={navToRedeemRequest}>Redeem Requests</a>
                <a>Manage Career</a>
                <a onClick={logout}>Sign out</a>
             </nav>

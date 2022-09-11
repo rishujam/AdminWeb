@@ -1,7 +1,8 @@
 import { db, messaging } from "./firebase-config"
-import { collection, doc, setDoc, getDocs, query, getDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, query, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { getStorage, ref, deleteObject, getDownloadURL} from "firebase/storage";
 import { async } from "@firebase/util";
+import { format } from "date-fns";
 
 const storage = getStorage();
 
@@ -237,10 +238,142 @@ const getUrl = async(user, campId, subCount) =>{
     }
 }
 
+const getAllReddemRequests = async() =>{
+    const querySnap = await getDocs(collection(db, "redeem"));
+    let redeemData = [];
+    querySnap.forEach((doc) =>{
+        redeemData.push(doc.data());
+    })
+    let sorted = sortRedeemReq(redeemData);
+    return sorted;
+}
+
+const sortRedeemReq = (requests) => {
+    for(const i of  requests){
+        var x = i["dateTime"].split(",")[0]
+        var formattedDate = x.split("/")[1]+"/"+x.split("/")[0]+"/"+x.split("/")[2];
+        var date = new Date(formattedDate);
+        var milliseconds = date.getTime();
+        i["dateTime"] = milliseconds;
+    }
+    const myData = [].concat(requests).sort((a, b) => a.dateTime > b.dateTime ? 1 : -1)
+    for(const i of myData){
+        var date = new Date(i["dateTime"]);
+        var formatted = format(date,"dd/MM/yyyy")
+        i["dateTime"] = formatted;
+    }
+    const final = [...myData].reverse();
+    return final;
+}
+
+const approveSelectedRedeem = async(selectedItems) =>{
+    let doneCount = 0;
+    let errorCount = 0;
+    for(const i of selectedItems){
+        try{
+            //DeleteRedeem Request
+            await deleteDoc(doc(db, "redeem", i["email"]));
+
+            //Add to payment Done
+            const rand = Number("100")* Math.random() + Math.random();
+            const map = {};
+            map[rand] = i["amount"];
+            const docRefPayment = doc(db, "paymentDone", i["email"]);
+            await setDoc(docRefPayment, map,{merge:true})
+
+            //getToken
+            let token = ""
+            const docRefToken = doc(db, "utils",`token${i["email"]}`);
+            let docum = await getDoc(docRefToken);
+            if(docum.exists()){
+                token = docum.data()["token"];
+            }
+
+            //sendNotify
+            if(token!==undefined && token!==""){
+                let message =  `₹${i["amount"]} Sent to your ${i["method"]}`;
+                const requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json',
+                        'Authorization': `key=${process.env.REACT_APP_SERVER_KEY_MESSAGING}`
+                    },
+                    body:JSON.stringify({
+                        "data" : {
+                            "message" :  message
+                        },
+                        "to" : token
+                    })
+                }
+                await fetch('https://fcm.googleapis.com/fcm/send', requestOptions)
+            }
+            doneCount++;
+        }catch(error){
+            errorCount++;
+        }
+    }
+    console.log(`Errors: ${errorCount}`);
+    console.log(`Success: ${doneCount}`);
+}
+
+const approveSingleRedeem =async(i) =>{
+    try{
+        //DeleteRedeem Request
+        await deleteDoc(doc(db, "redeem", i["email"]));
+
+        //Add to payment Done
+        const rand = Number("100")* Math.random() + Math.random();
+        const map = {};
+        map[rand] = i["amount"];
+        const docRefPayment = doc(db, "paymentDone", i["email"]);
+        await setDoc(docRefPayment, map,{merge:true})
+
+        //getToken
+        let token = ""
+        const docRefToken = doc(db, "utils",`token${i["email"]}`);
+        let docum = await getDoc(docRefToken);
+        if(docum.exists()){
+            token = docum.data()["token"];
+        }
+
+        //sendNotify
+        if(token!==undefined && token!==""){
+            let message =  `₹${i["amount"]} Sent to your ${i["method"]}`;
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Authorization': `key=${process.env.REACT_APP_SERVER_KEY_MESSAGING}`
+                },
+                body:JSON.stringify({
+                    "data" : {
+                        "message" :  message
+                    },
+                    "to" : token
+                })
+            }
+            await fetch('https://fcm.googleapis.com/fcm/send', requestOptions)
+        }
+    }catch(error){}
+}
+
+const rejectSelectedRedeem = async() =>{
+
+}
+
+const rejectSingleRedeem = async() =>{
+
+}
+
 
 export {
     rejectSubmit,
     deletePrevious,
     approveSubmittedApproval,
-    getUrl
+    getUrl,
+    getAllReddemRequests,
+    approveSelectedRedeem,
+    approveSingleRedeem,
+    rejectSelectedRedeem,
+    rejectSingleRedeem
 }

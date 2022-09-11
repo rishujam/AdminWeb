@@ -9,6 +9,7 @@ import Home from "./Home";
 import DateApprovals from "./DateApprovals";
 import Approval from  "./Approval"
 import NameApproval from "./NameApproval"
+import RedeemReq from "./RedeemReq"
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
           <Route exact path="/approvaldate" element={<DateApprovals/>} />
           <Route exact path="/approvalname" element={<NameApproval/>} />
           <Route exact path="/approval" element={<Approval/>}/>
+          <Route exact path="/redeemreq" element={<RedeemReq/>}/>
         </Routes>
       </Router>
     </div>
