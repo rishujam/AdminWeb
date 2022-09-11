@@ -275,7 +275,7 @@ const approveSelectedRedeem = async(selectedItems) =>{
             await deleteDoc(doc(db, "redeem", i["email"]));
 
             //Add to payment Done
-            const rand = Number("100")* Math.random() + Math.random();
+            const rand = Math.floor(Number("100")* Math.random() + Math.random());
             const map = {};
             map[rand] = i["amount"];
             const docRefPayment = doc(db, "paymentDone", i["email"]);
@@ -316,55 +316,6 @@ const approveSelectedRedeem = async(selectedItems) =>{
     console.log(`Success: ${doneCount}`);
 }
 
-const approveSingleRedeem =async(i) =>{
-    try{
-        //DeleteRedeem Request
-        await deleteDoc(doc(db, "redeem", i["email"]));
-
-        //Add to payment Done
-        const rand = Number("100")* Math.random() + Math.random();
-        const map = {};
-        map[rand] = i["amount"];
-        const docRefPayment = doc(db, "paymentDone", i["email"]);
-        await setDoc(docRefPayment, map,{merge:true})
-
-        //getToken
-        let token = ""
-        const docRefToken = doc(db, "utils",`token${i["email"]}`);
-        let docum = await getDoc(docRefToken);
-        if(docum.exists()){
-            token = docum.data()["token"];
-        }
-
-        //sendNotify
-        if(token!==undefined && token!==""){
-            let message =  `₹${i["amount"]} Sent to your ${i["method"]}`;
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type':'application/json',
-                    'Authorization': `key=${process.env.REACT_APP_SERVER_KEY_MESSAGING}`
-                },
-                body:JSON.stringify({
-                    "data" : {
-                        "message" :  message
-                    },
-                    "to" : token
-                })
-            }
-            await fetch('https://fcm.googleapis.com/fcm/send', requestOptions)
-        }
-    }catch(error){}
-}
-
-const rejectSelectedRedeem = async() =>{
-
-}
-
-const rejectSingleRedeem = async() =>{
-
-}
-
 
 export {
     rejectSubmit,
@@ -372,8 +323,5 @@ export {
     approveSubmittedApproval,
     getUrl,
     getAllReddemRequests,
-    approveSelectedRedeem,
-    approveSingleRedeem,
-    rejectSelectedRedeem,
-    rejectSingleRedeem
+    approveSelectedRedeem
 }

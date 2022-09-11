@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom';
 import {
-    getAllReddemRequests
+    getAllReddemRequests,
+    approveSelectedRedeem
   } from "./FirestoreFun"
+import { useNavigate } from 'react-router-dom';
 import "./style.css";
 
 function RedeemReq () {
     const [loadingRedeem, setLoadingRedeem] = useState(0);
     const [dataToShow, setDataToShow] = useState([]);
+    let navigate = useNavigate();
     const [selectedItemsRedeem, setSelectedItemsRedeem] = useState([]);
 
     const getData = async() =>{
@@ -20,27 +24,48 @@ function RedeemReq () {
         }
     }, [ 1 ]);
 
-    const handleCbClick =(e, mail) =>{
+    const handleCbClick =(e, value) =>{
         const checked = e.target.checked;
-        const email = mail;
-        if(email === "Select All" ){
+        const email = value["email"];
+        if(value === "Select All" ){
             let tempData = dataToShow.map((data)=>{
                 return { ...data, isChecked:checked}
             })
             setDataToShow(tempData);
+            if(checked) {
+                setSelectedItemsRedeem(tempData);
+            }else{
+                setSelectedItemsRedeem([]);
+            }
         }else{
-            let tempData = dataToShow.map((data)=>
-                data.email === email ? { ...data, isChecked: checked} : data
+            let tempData = dataToShow.map((data) =>
+                data.email === email ? { ...data, isChecked: checked } : data
             );
             setDataToShow(tempData)
+            if(checked){
+                if( !selectedItemsRedeem.includes(value)) {
+                    setSelectedItemsRedeem([...selectedItemsRedeem, value]);
+                }
+            }else{
+                let newData = [];
+                selectedItemsRedeem.map((item)=>{
+                    if(item["email"]!==value["email"]){
+                        newData.push(item);
+                    }
+                })
+                setSelectedItemsRedeem(newData)
+            }
         }
-        
     }
 
-    const click= () =>{
-        
-        console.log(Math.floor(rand));
+    const doneSelected=async()=>{
+        setLoadingRedeem(1);
+        let items = selectedItemsRedeem
+        await approveSelectedRedeem(items);
+        setLoadingRedeem(0);
+        navigate("../home", {replace:true});
     }
+
   return (
     <>
     {
@@ -52,8 +77,7 @@ function RedeemReq () {
                     </div>
                 </div>
                 <div className="top-right">
-                    <button className="btn" onClick={click}>Done Selected</button>
-                    <button className="btn" >Remove selected</button>
+                    <button className="btn" onClick={doneSelected}>Done Selected</button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div className="div2">
@@ -76,7 +100,7 @@ function RedeemReq () {
                                                 <li>{`${value.method}: ${value.methodDetail}`}</li>
                                             </ul>
                                             <ul style={{display:"flex", justifyContent:"center"}}>
-                                                <input name={value.email} type="checkbox" style={{marginRight:"20px"}} checked={value?.isChecked || false } onChange={(event)=>{handleCbClick(event, value.email)}}/>
+                                                <input name={value.email} type="checkbox" style={{marginRight:"20px"}} checked={value?.isChecked || false } onChange={(event)=>{handleCbClick(event, value)}}/>
                                             </ul>
                                             </div>
                                         )
@@ -84,6 +108,29 @@ function RedeemReq () {
                                 }
                             </ul>
                         </nav>
+                    </div>
+                    <div className="div3">
+                        {
+                            selectedItemsRedeem.length > 0 ? (
+                                <nav>
+                                <h1 style={{ color: "white" }}>Selected People</h1>
+                                <ul>
+                                    {
+                                        selectedItemsRedeem.map((value, key) => {
+                                            return (
+                                                <div key={key} style={{ marginBottom: "20px", color: "white", display: "flex" }}>
+                                                    <ul style={{ width: "80%" }}>
+                                                        <li>{value.email}</li>
+                                                        <li>{value.dateTime}</li>
+                                                    </ul>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </ul>
+                                </nav>
+                            ) : <></>
+                        }
                     </div>
                 </div>
             </div>
