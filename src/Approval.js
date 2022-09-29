@@ -57,7 +57,7 @@ const dialogCloseButtonStyles = {
   const [dialogState, setDialogState] = useState(false);
   const [ selectAllState, setSelectAllState ] = useState(false);
   let dateToSubMap ={};
-  let emailSubCountToSubMap = {};
+  let emailToData = {};
 
   approvalData.forEach(approval => {
     if (approval[ "status" ] === "Pending") {
@@ -69,10 +69,18 @@ const dialogCloseButtonStyles = {
 
   approvalPending.forEach(element => {
     dataToShow.push(element)
-    const key = `${element["dateTime"]}${element["user"]}`;
-    const key1 = `${element["user"].split("@")[0]}${element["subCount"]}`
+    let user = element["user"];
+    const key = `${element["dateTime"]}${user}`;
     dateToSubMap[key] = element;
-    emailSubCountToSubMap[key1] = element;
+    if(emailToData[user.split("@")[0]] === undefined ){
+      let temp = [];
+      temp.push(element)
+      emailToData[user.split("@")[0]] = temp;
+    }else{
+      let temp = emailToData[user.split("@")[0]];
+      temp.push(element);
+      emailToData[user.split("@")[0]] = temp;
+    }
   });
   
   approvalDone.forEach(element => {
@@ -247,19 +255,20 @@ const dialogCloseButtonStyles = {
           rowsArray.push(Object.keys(d));
           valuesArray.push(Object.values(d));
         });
-        let toApproveTemp = [];
-        for(const sub of valuesArray){
-            toApproveTemp.push(sub);
-        }
-        console.log(toApproveTemp);
         let toApprove = [];
         let skipped = 0;
-        for(const sub of toApproveTemp){
-          if(emailSubCountToSubMap[sub[0]]!==undefined){
-            toApprove.push(emailSubCountToSubMap[sub[0]]);
+        for(const sub of valuesArray){
+          let user = sub[0];
+          let no = sub[1];
+          let subDataForUser = emailToData[user];
+          let toAdd = [];
+          if(subDataForUser.length >= no){
+            toAdd = subDataForUser.slice(0,no);
           }else{
-            skipped++;
+            toAdd = subDataForUser
+            skipped = skipped+(no-subDataForUser.length);
           }
+          toApprove.push(...toAdd);
         }
         console.log(toApprove);
         const options = {
