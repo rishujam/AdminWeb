@@ -57,6 +57,7 @@ const dialogCloseButtonStyles = {
   const [dialogState, setDialogState] = useState(false);
   const [ selectAllState, setSelectAllState ] = useState(false);
   let dateToSubMap ={};
+  let emailSubCountToSubMap = {};
 
   approvalData.forEach(approval => {
     if (approval[ "status" ] === "Pending") {
@@ -69,7 +70,9 @@ const dialogCloseButtonStyles = {
   approvalPending.forEach(element => {
     dataToShow.push(element)
     const key = `${element["dateTime"]}${element["user"]}`;
+    const key1 = `${element["user"].split("@")[0]}${element["subCount"]}`
     dateToSubMap[key] = element;
+    emailSubCountToSubMap[key1] = element;
   });
   
   approvalDone.forEach(element => {
@@ -231,6 +234,63 @@ const dialogCloseButtonStyles = {
     });
   }
 
+  const uploadFileForApproval=(e)=>{
+    Papa.parse(e.target.files[0], {
+      header: true,
+      skipEmptyLines: true,
+      complete: function (results) {
+        const rowsArray = [];
+        const valuesArray = [];
+
+        // Iterating data to get column name and their values
+        results.data.map((d) => {
+          rowsArray.push(Object.keys(d));
+          valuesArray.push(Object.values(d));
+        });
+        let toApproveTemp = [];
+        for(const sub of valuesArray){
+            toApproveTemp.push(sub);
+        }
+        console.log(toApproveTemp);
+        let toApprove = [];
+        let skipped = 0;
+        for(const sub of toApproveTemp){
+          if(emailSubCountToSubMap[sub[0]]!==undefined){
+            toApprove.push(emailSubCountToSubMap[sub[0]]);
+          }else{
+            skipped++;
+          }
+        }
+        console.log(toApprove);
+        const options = {
+          title: 'Confirmation',
+          message: `Items Approving: ${toApprove.length}, Items Skipping: ${skipped}`,
+          buttons: [
+            {
+              label: 'Confirm',
+              onClick: () => startApproving(toApprove)
+            },
+            {
+              label: 'Cancel',
+              onClick: () => console.log("Cancelled")
+            }
+          ],
+          closeOnEscape: true,
+          closeOnClickOutside: false,
+          overlayClassName: "overlay-custom-class-name"
+        };
+        confirmAlert(options);
+      },
+    });
+  }
+
+  const startApproving = async(toApprove)=>{
+    setLoading(1);
+    await approveSubmittedApproval(toApprove);
+    setLoading(0);
+    navigate("../approvaldate", {replace:true});
+  }
+
   const continueTask=async(listToApprove, listToReject)=>{
     setLoading(1);
     await approveSubmittedApproval(listToApprove);
@@ -259,7 +319,7 @@ const dialogCloseButtonStyles = {
               </div>
               <div className="top-right">
                 <CSVLink {...csvReport}>Download CSV</CSVLink>
-                <input onChange={selectFile} id="csvInput" name="file" type="File" accept=".csv"/>
+                <input onChange={uploadFileForApproval} id="csvInput" name="file" type="File" accept=".csv"/>
                 <button className="btn" onClick={rejectSelected}>Rejected Selected</button>
                 <button className="btn" onClick={approveSelected}>Aprrove selected</button>
                 <button className="delete-btn" onClick={deletePreviousApprovals}>Delete previous</button>
