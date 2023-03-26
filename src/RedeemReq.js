@@ -6,6 +6,7 @@ import {
   } from "./FirestoreFun"
 import { useNavigate } from 'react-router-dom';
 import "./style.css";
+import { CSVLink } from "react-csv";
 
 function RedeemReq () {
     const [loadingRedeem, setLoadingRedeem] = useState(0);
@@ -66,6 +67,19 @@ function RedeemReq () {
         navigate("../home", {replace:true});
     }
 
+    const csvHeaders = [
+        {label:"User", key:"email"},
+        {label:"Amount", key:"amount"},
+        {label: "Method", key:"method"},
+        {label: "Number/Id", key:"methodDetail"}
+    ];
+
+    const csvReport = {
+        filename: `redeemreq.csv`,
+        headers:csvHeaders,
+        data:dataToShow
+    }
+
   return (
     <>
     {
@@ -77,6 +91,7 @@ function RedeemReq () {
                     </div>
                 </div>
                 <div className="top-right">
+                    <CSVLink {...csvReport}>Download CSV</CSVLink>
                     <button className="btn" onClick={doneSelected}>Done Selected</button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>

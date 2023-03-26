@@ -261,6 +261,10 @@ const dialogCloseButtonStyles = {
           let user = sub[0];
           let no = sub[1];
           let subDataForUser = emailToData[user];
+          if(subDataForUser === undefined) {
+            skipped++;
+            continue;
+          }
           let toAdd = [];
           if(subDataForUser.length >= no){
             toAdd = subDataForUser.slice(0,no);

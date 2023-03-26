@@ -250,9 +250,10 @@ const getAllReddemRequests = async() =>{
 
 const sortRedeemReq = (requests) => {
     for(const i of  requests){
-        var x = i["dateTime"].split(",")[0]
+        var x = i["dateTime"].split(",")[0];
+        var y = i["dateTime"].split(",")[1];
         var formattedDate = x.split("/")[1]+"/"+x.split("/")[0]+"/"+x.split("/")[2];
-        var date = new Date(formattedDate);
+        var date = new Date(formattedDate+" "+y);
         var milliseconds = date.getTime();
         i["dateTime"] = milliseconds;
     }
